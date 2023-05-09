@@ -24,7 +24,7 @@ More details are available in the [CONTRIBUTING.md](./CONTRIBUTING.md#pull-reque
 
 The following reference architecture shows how to implement a SCCA compliant hub-spoke topology in Azure. The Management spoke virtual networks connect with the hub and can be used to isolate management workloads. Management Spokes can exist in different subscriptions and represent different environments, such as Production and Non-production.
 
-![Architecture](./docs/images/azure-virtual-network-management-hub-with-firewall.png)
+![Architecture](https://github.com/azurenoops/terraform-azurerm-overlays-management-hub/blob/main/docs/images/mission_enclave_spoke_simple.png)
 
 These types of resources are supported:
 
