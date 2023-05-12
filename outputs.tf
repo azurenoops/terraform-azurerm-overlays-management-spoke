@@ -77,3 +77,23 @@ output "route_table_id" {
   description = "The resource id of the route table"
   value       = azurerm_route_table.routetable.id
 }
+
+output "private_dns_zone_names" {
+  description = "The name of the Private DNS zones within Azure DNS"
+  value       = [for s in module.mod_pdz : s.private_dns_zone_name] 
+}
+
+output "private_dns_zone_ids" {
+  description = "The resource id of Private DNS zones within Azure DNS"
+  value       = [for s in module.mod_pdz : s.private_dns_zone_id] 
+}
+
+output "storage_account_id" {
+  description = "The ID of the storage account."
+  value       = module.mgt_spoke.storage_account_id
+}
+
+output "storage_account_name" {
+  description = "The name of the storage account."
+  value       = module.mgt_spoke.storage_account_name
+}

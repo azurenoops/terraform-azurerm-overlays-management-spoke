@@ -2,9 +2,9 @@
 # Licensed under the MIT License.
 
 /*
-SUMMARY: Terraform Module to deploy the Hub Network based on the Azure Mission Landing Zone conceptual architecture
+SUMMARY: Terraform Module to deploy the Managment Spoke Network based on the Azure Mission Landing Zone conceptual architecture
 DESCRIPTION: The following components will be options in this deployment
-              * Hub Network Virtual Network    
+              * Managment Spoke Network Virtual Network    
               * Ddos Protection Plan
               * Network Watcher         
 AUTHOR/S: jspinella

@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 /*
-SUMMARY: Terraform Module to deploy the Network Watcher and Flog Logs for Hub Network based on the Azure Mission Landing Zone conceptual architecture
+SUMMARY: Terraform Module to deploy the Network Watcher and Flog Logs for Managment Spoke Network based on the Azure Mission Landing Zone conceptual architecture
 DESCRIPTION: The following components will be options in this deployment              
               * Network Watcher         
 AUTHOR/S: jspinella
@@ -11,11 +11,6 @@ AUTHOR/S: jspinella
 #-------------------------------------
 # Network Watcher - Default is "true"
 #-------------------------------------
-data "azurerm_resource_group" "netwatch" {
-  count = var.is_spoke_deployed_to_same_hub_subscription == true ? 1 : 0
-  name  = "NetworkWatcherRG"
-}
-
 resource "azurerm_resource_group" "nwatcher" {
   count    = var.is_spoke_deployed_to_same_hub_subscription == false ? 1 : 0
   name     = "NetworkWatcherRG"
@@ -36,11 +31,11 @@ resource "azurerm_network_watcher" "nwatcher" {
 #-----------------------------------------
 resource "azurerm_network_watcher_flow_log" "nwflog" {
   for_each                  = var.spoke_subnets
-  name                      = lower("${azurerm_network_watcher.nwatcher[0].name}-flow-log")
+  name                      = lower("Network-Watcher-flog-log-${each.value.name}")
   network_watcher_name      = var.is_spoke_deployed_to_same_hub_subscription == true ? "NetworkWatcher_${local.netwatcher_rg_location}" : azurerm_network_watcher.nwatcher.0.name
   resource_group_name       = local.netwatcher_rg_name # Must provide Netwatcher resource Group
   network_security_group_id = azurerm_network_security_group.nsg[each.key].id
-  storage_account_id        = data.azurerm_storage_account.hub-st.id
+  storage_account_id        = module.mgt_spoke.storage_account_id
   enabled                   = var.is_spoke_deployed_to_same_hub_subscription == false ? true : false
   version                   = 2
 

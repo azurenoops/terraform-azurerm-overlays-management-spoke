@@ -17,7 +17,8 @@ resource "azurerm_virtual_network_peering" "hub_to_spoke" {
   name                         = lower("peering-${element(split("/", var.hub_virtual_network_id), 8)}-to-spoke")
   resource_group_name          = element(split("/", var.hub_virtual_network_id), 4)
   virtual_network_name         = element(split("/", var.hub_virtual_network_id), 8)
-  allow_gateway_transit        = true
+  remote_virtual_network_id    = azurerm_virtual_network.spoke_vnet.id
+  allow_gateway_transit        = false
   allow_forwarded_traffic      = true
   allow_virtual_network_access = true
   use_remote_gateways          = var.use_dest_remote_hub_gateway

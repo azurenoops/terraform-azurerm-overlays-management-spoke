@@ -14,7 +14,9 @@ variable "subnet_address_prefix" {
 variable "subnet_service_endpoints" {
   description = "Service endpoints to add to the default subnet"
   type        = list(string)
-  default     = []
+  default     = [
+    "Microsoft.Storage",
+  ]
 }
 
 variable "private_endpoint_network_policies_enabled" {
