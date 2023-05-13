@@ -2,7 +2,7 @@
 
 [![Changelog](https://img.shields.io/badge/changelog-release-green.svg)](CHANGELOG.md) [![Notice](https://img.shields.io/badge/notice-copyright-yellow.svg)](NOTICE) [![MIT License](https://img.shields.io/badge/license-MIT-orange.svg)](LICENSE) [![TF Registry](https://img.shields.io/badge/terraform-registry-blue.svg)](https://registry.terraform.io/modules/azurenoops/overlays-management-spoke/azurerm/)
 
-This Overlay terraform module deploys a Management Spoke network using the [Microsoft recommended Hub-Spoke network topology](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke) to be used in a [SCCA compliant Management Network](https://registry.terraform.io/modules/azurenoops/overlays-management-hub/azurerm/latest). Usually, only one hub in each region with multiple spokes and each of them can also be in separate subscriptions.
+This Overlay terraform module deploys a Management Spoke network using the [Microsoft recommended Hub-Spoke network topology](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke) to be used in a [SCCA compliant Management Network](https://registry.terraform.io/modules/azurenoops/overlays-management-spoke/azurerm/latest). Usually, only one hub in each region with multiple spokes and each of them can also be in separate subscriptions.
 
 >If you are deploying the spoke VNet in the same Hub Management Network subscription, then make sure you have set the argument `is_spoke_deployed_to_same_hub_subscription = true`. This helps this module to manage the network watcher, flow logs and traffic analytics resources for all the subnets in the Virtual Network. If you are deploying the spoke virtual networks in separate subscriptions, then set this argument to `false`.
 
@@ -139,12 +139,11 @@ module "vnet-spoke" {
 
 Spoke Networking is set up in a Management Spoke Overlay design based on the SCCA Hub/Spoke architecture. The Management Spoke Overlay is a central point of connectivity to many different networks.
 
-The following parameters affect Management Hub Overlay Networking.
-
+The following parameters affect Management Spoke Overlay Networking.
+vnet-spoke
 Parameter name | Location | Default Value | Description
 -------------- | ------------- | ------------- | -----------
 `virtual_network_address_space` | `variables.vnet.tf` | '10.0.100.0/24' | The CIDR Virtual Network Address Prefix for the Spoke Virtual Network.
-`subnet_address_prefix` | `variables.snet.tf` | '10.0.100.128/27' | The CIDR Subnet Address Prefix for the default Spoke subnet. It must be in the Spoke Virtual Network space.
 
 ## Subnets
 
@@ -159,16 +158,16 @@ Service Endpoints allows connecting certain platform services into virtual netwo
 This module supports enabling the service endpoint of your choosing under the virtual network and with the specified subnet. The list of Service endpoints to associate with the subnet values include: `Microsoft.AzureActiveDirectory`, `Microsoft.AzureCosmosDB`, `Microsoft.ContainerRegistry`, `Microsoft.EventHub`, `Microsoft.KeyVault`, `Microsoft.ServiceBus`, `Microsoft.Sql`, `Microsoft.Storage` and `Microsoft.Web`.
 
 ```hcl
-module "vnet-hub" {
-  source  = "azurenoops/overlays-management-hub/azurerm"
+module "vnet-spoke" {
+  source  = "azurenoops/overlays-management-spoke/azurerm"
   version = "x.x.x"
 
   # .... omitted
 
   # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
-    mgnt_subnet = {
-      subnet_name           = "management"
+    default = {
+      subnet_name           = "default"
       subnet_address_prefix = "10.1.2.0/24"
 
       service_endpoints     = ["Microsoft.Storage"]  
@@ -187,16 +186,16 @@ Subnet delegation enables you to designate a specific subnet for an Azure PaaS s
 This module supports enabling the service delegation of your choosing under the virtual network and with the specified subnet.  For more information, check the [terraform resource documentation](https://www.terraform.io/docs/providers/azurerm/r/subnet.html#service_delegation).
 
 ```hcl
-module "vnet-hub" {
-  source  = "azurenoops/overlays-management-hub/azurerm"
+module "vnet-spoke" {
+  source  = "azurenoops/overlays-management-spoke/azurerm"
   version = "x.x.x"
 
   # .... omitted
 
   # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
-    mgnt_subnet = {
-      subnet_name           = "management"
+    default = {
+      subnet_name           = "default"
       subnet_address_prefix = "10.1.2.0/24"
 
       delegation = {
@@ -221,16 +220,16 @@ Network policies, like network security groups (NSG), are not supported for Priv
 This module Enable or Disable network policies for the private link endpoint on the subnet. The default value is `false`. If you are enabling the Private Link Endpoints on the subnet you shouldn't use Private Link Services as it's conflicts.
 
 ```hcl
-module "vnet-hub" {
-  source  = "azurenoops/overlays-management-hub/azurerm"
+module "vnet-spoke" {
+  source  = "azurenoops/overlays-management-spoke/azurerm"
   version = "x.x.x"
 
   # .... omitted
 
   # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
-    mgnt_subnet = {
-      subnet_name           = "management"
+   default = {
+      subnet_name           = "default"
       subnet_address_prefix = "10.1.2.0/24"
       private_endpoint_network_policies_enabled = true
 
@@ -251,16 +250,16 @@ In order to deploy a Private Link Service on a given subnet, you must set the `p
 This module Enable or Disable network policies for the private link service on the subnet. The default value is `false`. If you are enabling the Private Link service on the subnet then, you shouldn't use Private Link endpoints as it's conflicts.
 
 ```hcl
-module "vnet-hub" {
-  source  = "azurenoops/overlays-management-hub/azurerm"
+module "vnet-spoke" {
+  source  = "azurenoops/overlays-management-spoke/azurerm"
   version = "x.x.x"
 
   # .... omitted
 
   # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
-    mgnt_subnet = {
-      subnet_name           = "management"
+    default = {
+      subnet_name           = "default"
       subnet_address_prefix = "10.1.2.0/24"
       private_link_service_network_policies_enabled = true
 
@@ -282,28 +281,30 @@ In the Source and Destination columns, `VirtualNetwork`, `AzureLoadBalancer`, an
 *You cannot remove the default rules, but you can override them by creating rules with higher priorities.*
 
 ```hcl
-module "vnet-hub" {
-  source  = "azurenoops/overlays-management-hub/azurerm"
+module "vnet-spoke" {
+  source  = "azurenoops/overlays-management-spoke/azurerm"
   version = "x.x.x"
 
   # .... omitted
 
   # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
-    mgnt_subnet = {
-      subnet_name           = "management"
+    default = {
+      subnet_name           = "default"
       subnet_address_prefix = "10.1.2.0/24"
       nsg_subnet_inbound_rules = [
-        # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix]
-        # To use defaults, use "" without adding any value and to use this subnet as a source or destination prefix.
-        ["weballow", "200", "Inbound", "Allow", "Tcp", "22", "*", ""],
-        ["weballow1", "201", "Inbound", "Allow", "Tcp", "3389", "*", ""],
+        # [name, description, priority, direction, access, protocol, destination_port_range, source_address_prefixes, destination_address_prefix]
+        # Use "" for description to use default description
+        # To use defaults, use [""] without adding any value and to use this subnet as a source or destination prefix.      
+        ["Allow-Traffic-From-Spokes", "Allow traffic from spokes", "200", "Inbound", "Allow", "*", ["22", "80", "443", "3389"], ["10.8.8.0/24"], [""]],
+        ["weballow", "", "200", "Inbound", "Allow", "Tcp", "22", "*", ""],
+        ["weballow1", "", "201", "Inbound", "Allow", "Tcp", "3389", "*", ""],
       ]
 
       nsg_subnet_outbound_rules = [
         # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix]
         # To use defaults, use "" without adding any value and to use this subnet as a source or destination prefix.
-        ["ntp_out", "103", "Outbound", "Allow", "Udp", "123", "", "0.0.0.0/0"],
+        ["ntp_out", "", "103", "Outbound", "Allow", "Udp", "123", "", "0.0.0.0/0"],
       ]
     }
   }
@@ -347,7 +348,7 @@ This is an optional feature and only applicable if you are using your own DNS se
 
 ## Linking Hub Private DNS Zone
 
-This module facilitates to link the spoke VNet to private DNS preferably created by Hub Module. To create a link to private DNS zone, set the domain name of the private DNS zone with variable `private_dns_zone_name`. This will always set automatic registration of records to `true`.  
+This module facilitates to link the spoke VNet to private DNS preferably created by Spoke Module. To create a link to private DNS zone, set the domain name of the private DNS zone with variable `private_dns_zones`. If you want to link multiple private DNS zones, set the argument `private_dns_zones = ["privatelink.blob.core.windows.net", "privatelink.file.core.windows.net"]`  
 
 ## Recommended naming and tagging conventions
 
