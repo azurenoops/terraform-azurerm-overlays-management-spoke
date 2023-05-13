@@ -11,15 +11,15 @@ resource "azurerm_network_security_group" "nsg" {
     for_each = concat(lookup(each.value, "nsg_subnet_inbound_rules", []), lookup(each.value, "nsg_subnet_outbound_rules", []))
     content {
       name                         = security_rule.value[0] == "" ? "Default_Rule" : security_rule.value[0]
-      priority                     = security_rule.value[1]
-      direction                    = security_rule.value[2] == "" ? "Inbound" : security_rule.value[2]
-      access                       = security_rule.value[3] == "" ? "Allow" : security_rule.value[3]
-      protocol                     = security_rule.value[4] == "" ? "Tcp" : security_rule.value[4]
+      description                  = security_rule.value[1] == "" ? "Default_Rule" : security_rule.value[1]
+      priority                     = security_rule.value[2]
+      direction                    = security_rule.value[3] == "" ? "Inbound" : security_rule.value[3]
+      access                       = security_rule.value[4] == "" ? "Allow" : security_rule.value[4]
+      protocol                     = security_rule.value[5] == "" ? "Tcp" : security_rule.value[5]
       source_port_range            = "*"
-      destination_port_ranges      = security_rule.value[5] == [""] ? ["*"] : security_rule.value[5]
-      source_address_prefixes      = security_rule.value[6] == [""] ? each.value.address_prefixes : security_rule.value[6]
-      destination_address_prefixes = security_rule.value[7] == [""] ? each.value.address_prefixes : security_rule.value[7]
-      description                  = "${security_rule.value[2]}_Port_${security_rule.value[5]}"
+      destination_port_ranges      = security_rule.value[6] == [""] ? ["*"] : security_rule.value[6]
+      source_address_prefixes      = security_rule.value[7] == [""] ? each.value.address_prefixes : security_rule.value[7]
+      destination_address_prefixes = security_rule.value[8] == [""] ? each.value.address_prefixes : security_rule.value[8]      
     }
   }
 }

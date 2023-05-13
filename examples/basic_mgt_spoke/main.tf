@@ -3,25 +3,11 @@ provider "azurerm" {
   features {}
 }
 
-data "azurerm_virtual_network" "hub-vnet" {
-  name                = "anoa-eus-hub-core-dev-vnet"
-  resource_group_name = "anoa-eus-hub-core-dev-rg"
-}
-
-data "azurerm_storage_account" "hub-st" {
-  name                = "anoaeusd46f0d7ae4devst"
-  resource_group_name = "anoa-eus-hub-core-dev-rg"
-}
-
-data "azurerm_log_analytics_workspace" "hub-logws" {
-  name                = "anoa-eus-ops-mgt-logging-dev-log"
-  resource_group_name = "anoa-eus-ops-mgt-logging-dev-rg"
-}
-
 module "mod_vnet_spoke" {
-  source  = "azurenoops/overlays-management-spoke/azurerm"
-  version = "2.0.0"
-  
+  #source  = "azurenoops/overlays-management-spoke/azurerm"
+  #version = ">= 2.0.0"
+  source = "../.."
+
   # By default, this module will create a resource group, provide the name here
   # To use an existing resource group, specify the existing resource group name, 
   # and set the argument to `create_resource_group = false`. Location will be same as existing RG.
@@ -32,24 +18,24 @@ module "mod_vnet_spoke" {
   environment           = "public"
   workload_name         = "id-core"
 
-  # Collect Hub Virtual Network Parameters
-  # Hub network details to create peering and other setup
+  # Collect Spoke Virtual Network Parameters
+  # Spoke network details to create peering and other setup
   hub_virtual_network_id          = data.azurerm_virtual_network.hub-vnet.id
-  hub_firewall_private_ip_address = "10.0.100.4"  
+  hub_firewall_private_ip_address = "10.8.4.68"
   hub_storage_account_id          = data.azurerm_storage_account.hub-st.id
 
   # (Required) To enable Azure Monitoring and flow logs
-  # pick the values for log analytics workspace which created by Hub module
+  # pick the values for log analytics workspace which created by Spoke module
   # Possible values range between 30 and 730
   log_analytics_workspace_id           = data.azurerm_log_analytics_workspace.hub-logws.id
   log_analytics_customer_id            = data.azurerm_log_analytics_workspace.hub-logws.workspace_id
   log_analytics_logs_retention_in_days = 30
 
   # Provide valid VNet Address space for spoke virtual network.    
-  virtual_network_address_space = ["10.0.100.0/24"] # (Required)  Hub Virtual Network Parameters
-   
+  virtual_network_address_space = ["10.8.6.0/24"] # (Required)  Spoke Virtual Network Parameters
+
   # (Required) Specify if you are deploying the spoke VNet using the same hub Azure subscription
-  is_spoke_deployed_to_same_hub_subscription = true  
+  is_spoke_deployed_to_same_hub_subscription = true
 
   # (Required) Multiple Subnets, Service delegation, Service Endpoints, Network security groups
   # These are default subnets with required configuration, check README.md for more details
@@ -58,10 +44,10 @@ module "mod_vnet_spoke" {
   spoke_subnets = {
     default = {
       name                                       = "id-core"
-      address_prefixes                           = ["10.0.100.64/26"]
+      address_prefixes                           = ["10.8.6.0/27"]
       service_endpoints                          = ["Microsoft.Storage"]
       private_endpoint_network_policies_enabled  = false
-      private_endpoint_service_endpoints_enabled = true
+      private_endpoint_service_endpoints_enabled = true      
     }
   }
 
@@ -71,11 +57,10 @@ module "mod_vnet_spoke" {
   enable_forced_tunneling_on_route_table = true
 
   # Private DNS Zone Settings
-  # By default, Azure NoOps will create Private DNS Zones for Logging in Hub VNet.
   # If you do want to create addtional Private DNS Zones, 
   # add in the list of private_dns_zones to be created.
   # else, remove the private_dns_zones argument.
-  private_dns_zones_to_link_to_hub = ["privatelink.file.core.windows.net"]  
+  private_dns_zones = ["privatelink.table.core.windows.net"]
 
   # By default, this will apply resource locks to all resources created by this module.
   # To disable resource locks, set the argument to `enable_resource_locks = false`.

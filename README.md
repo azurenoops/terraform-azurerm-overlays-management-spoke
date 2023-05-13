@@ -2,7 +2,7 @@
 
 [![Changelog](https://img.shields.io/badge/changelog-release-green.svg)](CHANGELOG.md) [![Notice](https://img.shields.io/badge/notice-copyright-yellow.svg)](NOTICE) [![MIT License](https://img.shields.io/badge/license-MIT-orange.svg)](LICENSE) [![TF Registry](https://img.shields.io/badge/terraform-registry-blue.svg)](https://registry.terraform.io/modules/azurenoops/overlays-management-spoke/azurerm/)
 
-This Overlay terraform module deploys a Management spoke network using the [Microsoft recommended Hub-Spoke network topology](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke) to be used in a [SCCA compliant Management Network](https://registry.terraform.io/modules/azurenoops/overlays-management-hub/azurerm/latest). Usually, only one hub in each region with multiple spokes and each of them can also be in separate subscriptions.
+This Overlay terraform module deploys a Management Spoke network using the [Microsoft recommended Hub-Spoke network topology](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke) to be used in a [SCCA compliant Management Network](https://registry.terraform.io/modules/azurenoops/overlays-management-hub/azurerm/latest). Usually, only one hub in each region with multiple spokes and each of them can also be in separate subscriptions.
 
 >If you are deploying the spoke VNet in the same Hub Management Network subscription, then make sure you have set the argument `is_spoke_deployed_to_same_hub_subscription = true`. This helps this module to manage the network watcher, flow logs and traffic analytics resources for all the subnets in the Virtual Network. If you are deploying the spoke virtual networks in separate subscriptions, then set this argument to `false`.
 
@@ -135,25 +135,22 @@ module "vnet-spoke" {
 }
 ```
 
-## Create resource group
+## Spoke Networking
 
-By default, this module will create a resource group and the name of the resource group to be given in an argument `resource_group_name`. If you want to use an existing resource group, specify the existing resource group name, and set the argument to `create_resource_group = false`.
+Spoke Networking is set up in a Management Spoke Overlay design based on the SCCA Hub/Spoke architecture. The Management Spoke Overlay is a central point of connectivity to many different networks.
 
-> *If you are using an existing resource group, then this module uses the same resource group location to create all resources in this module.*
+The following parameters affect Management Hub Overlay Networking.
 
-## Azure Network DDoS Protection Plan
-
-By default, this module will not create a DDoS Protection Plan. You can enable/disable it by appending an argument `create_ddos_plan`. If you want to enable a DDoS plan using this module, set argument `create_ddos_plan = true`
-
-## Custom DNS servers
-
-This is an optional feature and only applicable if you are using your own DNS servers superseding default DNS services provided by Azure.Set the argument `dns_servers = ["4.4.4.4"]` to enable this option. For multiple DNS servers, set the argument `dns_servers = ["4.4.4.4", "8.8.8.8"]`
+Parameter name | Location | Default Value | Description
+-------------- | ------------- | ------------- | -----------
+`virtual_network_address_space` | `variables.vnet.tf` | '10.0.100.0/24' | The CIDR Virtual Network Address Prefix for the Spoke Virtual Network.
+`subnet_address_prefix` | `variables.snet.tf` | '10.0.100.128/27' | The CIDR Subnet Address Prefix for the default Spoke subnet. It must be in the Spoke Virtual Network space.
 
 ## Subnets
 
 This module handles the creation and a list of address spaces for subnets. This module uses `for_each` to create subnets and corresponding service endpoints, service delegation, and network security groups. This module associates the subnets to network security groups as well with additional user-defined NSG rules.  
 
-This module creates 2 subnets by default: Application Subnet and Database Subnet and both subnets route the traffic through the firewall if `hub_firewall_private_ip_address` argument set else all traffic will forward to VNet.
+This module creates 1 subnets by default: Default Subnet
 
 ## Virtual Network service endpoints
 
@@ -161,12 +158,10 @@ Service Endpoints allows connecting certain platform services into virtual netwo
 
 This module supports enabling the service endpoint of your choosing under the virtual network and with the specified subnet. The list of Service endpoints to associate with the subnet values include: `Microsoft.AzureActiveDirectory`, `Microsoft.AzureCosmosDB`, `Microsoft.ContainerRegistry`, `Microsoft.EventHub`, `Microsoft.KeyVault`, `Microsoft.ServiceBus`, `Microsoft.Sql`, `Microsoft.Storage` and `Microsoft.Web`.
 
-> **Recommendation: It is recommended to set as few service endpoints as possible on Spoke subnets. Storage Endpoint is useful and doesn't clutter the firewall logs. Besides, add other endpoints if those are absolutely necessary.**
-
 ```hcl
-module "vnet-spoke" {
-  source  = "kumarvna/caf-virtual-network-spoke/azurerm"
-  version = "2.2.0"
+module "vnet-hub" {
+  source  = "azurenoops/overlays-management-hub/azurerm"
+  version = "x.x.x"
 
   # .... omitted
 
@@ -174,9 +169,43 @@ module "vnet-spoke" {
   subnets = {
     mgnt_subnet = {
       subnet_name           = "management"
-      subnet_address_prefix = "10.2.2.0/24"
+      subnet_address_prefix = "10.1.2.0/24"
 
       service_endpoints     = ["Microsoft.Storage"]  
+    }
+  }
+
+# ....omitted
+
+}
+```
+
+## Subnet Service Delegation
+
+Subnet delegation enables you to designate a specific subnet for an Azure PaaS service of your choice that needs to be injected into your virtual network. The Subnet delegation provides full control to manage the integration of Azure services into virtual networks.
+
+This module supports enabling the service delegation of your choosing under the virtual network and with the specified subnet.  For more information, check the [terraform resource documentation](https://www.terraform.io/docs/providers/azurerm/r/subnet.html#service_delegation).
+
+```hcl
+module "vnet-hub" {
+  source  = "azurenoops/overlays-management-hub/azurerm"
+  version = "x.x.x"
+
+  # .... omitted
+
+  # Multiple Subnets, Service delegation, Service Endpoints
+  subnets = {
+    mgnt_subnet = {
+      subnet_name           = "management"
+      subnet_address_prefix = "10.1.2.0/24"
+
+      delegation = {
+        name = "demodelegationcg"
+        service_delegation = {
+          name    = "Microsoft.ContainerInstance/containerGroups"
+          actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
+        }
+      }
     }
   }
 
@@ -192,9 +221,9 @@ Network policies, like network security groups (NSG), are not supported for Priv
 This module Enable or Disable network policies for the private link endpoint on the subnet. The default value is `false`. If you are enabling the Private Link Endpoints on the subnet you shouldn't use Private Link Services as it's conflicts.
 
 ```hcl
-module "vnet-spoke" {
-  source  = "kumarvna/caf-virtual-network-spoke/azurerm"
-  version = "2.2.0"
+module "vnet-hub" {
+  source  = "azurenoops/overlays-management-hub/azurerm"
+  version = "x.x.x"
 
   # .... omitted
 
@@ -202,7 +231,7 @@ module "vnet-spoke" {
   subnets = {
     mgnt_subnet = {
       subnet_name           = "management"
-      subnet_address_prefix = "10.2.2.0/24"
+      subnet_address_prefix = "10.1.2.0/24"
       private_endpoint_network_policies_enabled = true
 
         }
@@ -211,8 +240,8 @@ module "vnet-spoke" {
   }
 
 # ....omitted
-
-}
+  
+  } 
 ```
 
 ## `private_link_service_network_policies_enabled` - private link service on the subnet
@@ -222,9 +251,9 @@ In order to deploy a Private Link Service on a given subnet, you must set the `p
 This module Enable or Disable network policies for the private link service on the subnet. The default value is `false`. If you are enabling the Private Link service on the subnet then, you shouldn't use Private Link endpoints as it's conflicts.
 
 ```hcl
-module "vnet-spoke" {
-  source  = "kumarvna/caf-virtual-network-spoke/azurerm"
-  version = "2.2.0"
+module "vnet-hub" {
+  source  = "azurenoops/overlays-management-hub/azurerm"
+  version = "x.x.x"
 
   # .... omitted
 
@@ -232,7 +261,7 @@ module "vnet-spoke" {
   subnets = {
     mgnt_subnet = {
       subnet_name           = "management"
-      subnet_address_prefix = "10.2.2.0/24"
+      subnet_address_prefix = "10.1.2.0/24"
       private_link_service_network_policies_enabled = true
 
         }
@@ -244,56 +273,77 @@ module "vnet-spoke" {
 
 }
 ```
-
 ## Network Security Groups
 
-By default, the network security groups connected to all subnets and only allow necessary traffic also block everything else (deny-all rule). Use `nsg_inbound_rules` and `nsg_outbound_rules` in this Terraform module to create a Network Security Group (NSG) for each subnet and allow it to add additional rules for inbound flows.
+By default, the network security groups connected to subnets will only allow necessary traffic and block everything else (deny-all rule). Use `nsg_subnet_inbound_rules` and `nsg_subnet_outbound_rules` in this Terraform module to create a Network Security Group (NSG) for each subnet and allow it to add additional rules for inbound flows.
 
 In the Source and Destination columns, `VirtualNetwork`, `AzureLoadBalancer`, and `Internet` are service tags, rather than IP addresses. In the protocol column, Any encompasses `TCP`, `UDP`, and `ICMP`. When creating a rule, you can specify `TCP`, `UDP`, `ICMP` or `*`. `0.0.0.0/0` in the Source and Destination columns represents all addresses.
 
->*You cannot remove the default rules, but you can override them by creating rules with higher priorities.*
+*You cannot remove the default rules, but you can override them by creating rules with higher priorities.*
 
 ```hcl
-module "vnet-spoke" {
-  source  = "kumarvna/caf-virtual-network-spoke/azurerm"
-  version = "2.2.0"
+module "vnet-hub" {
+  source  = "azurenoops/overlays-management-hub/azurerm"
+  version = "x.x.x"
 
   # .... omitted
 
   # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
     mgnt_subnet = {
-      subnet_name           = "application"
-      subnet_address_prefix = "10.2.2.0/24"
-
-      nsg_inbound_rules = [
+      subnet_name           = "management"
+      subnet_address_prefix = "10.1.2.0/24"
+      nsg_subnet_inbound_rules = [
         # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix]
         # To use defaults, use "" without adding any value and to use this subnet as a source or destination prefix.
-        ["weballow", "200", "Inbound", "Allow", "Tcp", "80", "*", ""],
-        ["weballow1", "201", "Inbound", "Allow", "Tcp", "443", "*", ""],
+        ["weballow", "200", "Inbound", "Allow", "Tcp", "22", "*", ""],
+        ["weballow1", "201", "Inbound", "Allow", "Tcp", "3389", "*", ""],
       ]
 
-      nsg_outbound_rules = [
+      nsg_subnet_outbound_rules = [
         # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix]
         # To use defaults, use "" without adding any value and to use this subnet as a source or destination prefix.
         ["ntp_out", "103", "Outbound", "Allow", "Udp", "123", "", "0.0.0.0/0"],
       ]
     }
   }
+
+# ....omitted
+
 }
 ```
-
-## Network Watcher
-
-This module handle the provision of Network Watcher resource by defining `create_network_watcher` variable. It will enable network watcher, flow logs and traffic analytics for all the subnets in the Virtual Network. Since Azure uses a specific naming standard on network watchers, It will create a resource group `NetworkWatcherRG` and adds the location specific resource.
-
-## Azure Monitoring Diagnostics
-
-Platform logs in Azure, including the Azure Activity log and resource logs, provide detailed diagnostic and auditing information for Azure resources and the Azure platform they depend on. Platform metrics are collected by default and typically stored in the Azure Monitor metrics database. This module enables to send all the logs and metrics to either storage account, event hub or Log Analytics workspace.
 
 ## Peering to Hub
 
 To peer spoke networks to the hub networks requires the service principal that performs the peering has `Network Contributor` role on hub network. Linking the Spoke to Hub DNS zones, the service principal also needs the `Private DNS Zone Contributor` role on hub network. If Log Analytics workspace is created in hub or another subscription then, the service principal must have `Log Analytics Contributor` role on workspace or a custom role to connect resources to workspace.
+
+## Optional Features
+
+Management Spoke Overlay has optional features that can be enabled by setting parameters on the deployment.
+
+## Create resource group
+
+By default, this module will create a resource group and the name of the resource group to be given in an argument `resource_group_name`. If you want to use an existing resource group, specify the existing resource group name, and set the argument to `create_resource_group = false`.
+
+> *If you are using an existing resource group, then this module uses the same resource group location to create all resources in this module.*
+
+## Azure Network DDoS Protection Plan
+
+By default, this module will not create a DDoS Protection Plan. You can enable/disable it by appending an argument `create_ddos_plan`. If you want to enable a DDoS plan using this module, set argument `create_ddos_plan = true`
+
+## Azure Network Network Watcher
+
+This module handle the provision of Network Watcher resource by defining `create_network_watcher` variable. It will enable network watcher, flow logs and traffic analytics for all the subnets in the Virtual Network. Since Azure uses a specific naming standard on network watchers, It will create a resource group `NetworkWatcherRG` and adds the location specific resource.
+
+> **Note:** *Log Analytics workspace is required for NSG Flow Logs and Traffic Analytics. If you want to enable NSG Flow Logs and Traffic Analytics, you must create a Log Analytics workspace and provide the workspace name set argument `log_analytics_workspace_name` and rg set argument `log_analytics_workspace_resource_group_name`*
+
+## Enable Force Tunneling for the Firewall
+
+By default, this module will not create a force tunnel on the firewall. You can enable/disable it by appending an argument `enable_force_tunneling` located in `variables.fw.tf` If you want to enable a DDoS plan using this module, set argument `enable_force_tunneling = true`. Enabling this feature will ensure that the firewall is the default route for all the T0 through T3 Network routes.
+
+## Custom DNS servers
+
+This is an optional feature and only applicable if you are using your own DNS servers superseding default DNS services provided by Azure.Set the argument `dns_servers = ["4.4.4.4"]` to enable this option. For multiple DNS servers, set the argument `dns_servers = ["4.4.4.4", "8.8.8.8"]`
 
 ## Linking Hub Private DNS Zone
 
