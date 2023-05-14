@@ -17,6 +17,7 @@ module "mod_pdz" {
   private_dns_zone_name = each.key
   resource_group_name   = local.resource_group_name
   private_dns_zone_vnets_ids = [
+    var.hub_virtual_network_id,
     azurerm_virtual_network.spoke_vnet.id,
   ]
   add_tags = merge({ "ResourceName" = format("%s", lower(each.key)) }, local.default_tags, var.add_tags, )
