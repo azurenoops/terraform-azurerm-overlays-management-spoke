@@ -15,11 +15,3 @@ terraform {
   }
 }
 
-#-------------------------------------
-# Azure Provider Alias for Peering
-#-------------------------------------
-provider "azurerm" {
-  alias           = "hub_network"
-  subscription_id = coalesce(element(split("/", var.hub_virtual_network_id), 2), data.azurerm_client_config.current.subscription_id)
-  features {}
-}

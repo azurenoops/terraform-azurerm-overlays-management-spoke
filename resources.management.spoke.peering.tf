@@ -1,3 +1,15 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+#-------------------------------------
+# Azure Provider Alias for Peering
+#-------------------------------------
+provider "azurerm" {
+  alias           = "hub_network"
+  subscription_id = element(split("/", var.hub_virtual_network_id), 2)
+  features {}
+}
+
 #-----------------------------------------------
 # Peering between Hub and Spoke Virtual Network
 #-----------------------------------------------
