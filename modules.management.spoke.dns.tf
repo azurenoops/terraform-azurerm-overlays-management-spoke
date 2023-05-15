@@ -12,10 +12,11 @@ AUTHOR/S: jspinella
 # Private DNS Zone
 #----------------------------------------
 module "mod_pdz" {
-  source                = "./modules/private_dns_zone"
-  for_each              = toset(var.private_dns_zones)
-  private_dns_zone_name = each.key
-  resource_group_name   = local.resource_group_name
+  source                      = "./modules/private_dns_zone"
+  for_each                    = toset(var.private_dns_zones)
+  private_dns_zone_name       = each.key
+  resource_group_name         = local.resource_group_name
+  vm_autoregistration_enabled = true
   private_dns_zone_vnets_ids = [
     var.hub_virtual_network_id,
     azurerm_virtual_network.spoke_vnet.id,
