@@ -90,10 +90,10 @@ output "private_dns_zone_ids" {
 
 output "storage_account_id" {
   description = "The ID of the storage account."
-  value       = module.mgt_spoke.storage_account_id
+  value       = module.mgt_storage_account_spoke.storage_account_id
 }
 
 output "storage_account_name" {
   description = "The name of the storage account."
-  value       = module.mgt_spoke.storage_account_name
+  value       = module.mgt_storage_account_spoke.storage_account_name
 }

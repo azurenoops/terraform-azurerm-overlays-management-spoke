@@ -35,7 +35,7 @@ resource "azurerm_network_watcher_flow_log" "nwflog" {
   network_watcher_name      = var.is_spoke_deployed_to_same_hub_subscription == true ? "NetworkWatcher_${local.netwatcher_rg_location}" : azurerm_network_watcher.nwatcher.0.name
   resource_group_name       = local.netwatcher_rg_name # Must provide Netwatcher resource Group
   network_security_group_id = azurerm_network_security_group.nsg[each.key].id
-  storage_account_id        = module.mgt_spoke.storage_account_id
+  storage_account_id        = module.mgt_storage_account_spoke.storage_account_id
   enabled                   = true
   version                   = 2
 
