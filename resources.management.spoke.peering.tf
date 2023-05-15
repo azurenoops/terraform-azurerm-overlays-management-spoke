@@ -1,6 +1,12 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+# This is used to create an alias for the hub network to allow peering between the hub and spoke.
+
+# Split on the "/" character on var.hub_virtual_network_id and return the 8th element. This is the virtual_network_name.
+# Split on the "/" character on var.hub_virtual_network_id and return the 4th element. This is the resource group name.
+# Split on the "/" character on var.hub_virtual_network_id and return the 2th element. This is the subscription id.
+
 #-------------------------------------
 # Azure Provider Alias for Peering
 #-------------------------------------
