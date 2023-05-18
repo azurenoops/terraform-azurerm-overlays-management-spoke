@@ -8,6 +8,10 @@ This Overlay terraform module deploys a Management Spoke network using the [Micr
 
 This is designed to quickly deploy hub and spoke architecture in the azure and further security hardening would be recommend to add appropriate NSG rules to use this for any production workloads.
 
+## Using Azure Clouds
+
+Since this module is built for both public and us government clouds. The `environment` variable defaults to `public` for Azure Cloud. When using this module with the Azure Government Cloud, you must set the `environment` variable to `usgovernment`. This will ensure that the correct Azure Government Cloud endpoints are used. You will also need to set the `location` variable to a valid Azure Government Cloud location. For more information on Azure Government Cloud, see the [Azure Government](https://docs.microsoft.com/en-us/azure/azure-government/documentation-government-get-started) documentation.
+
 ## SCCA Compliance
 
 This module can be SCCA compliant and can be used in a SCCA compliant Network. Enable private endpoints and SCCA compliant network rules to make it SCCA compliant.
