@@ -42,7 +42,7 @@ output "subnet_ids" {
 }
 
 output "subnet_names" {
-  description = "List of IDs of subnets with names"
+  description = "List of names of subnets"
   value       = flatten(concat([for s in azurerm_subnet.default_snet : s.name]))
 }
 
