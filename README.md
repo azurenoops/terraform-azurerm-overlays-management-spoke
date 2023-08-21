@@ -10,7 +10,26 @@ This is designed to quickly deploy hub and spoke architecture in the azure and f
 
 ## Using Azure Clouds
 
-Since this module is built for both public and us government clouds. The `environment` variable defaults to `public` for Azure Cloud. When using this module with the Azure Government Cloud, you must set the `environment` variable to `usgovernment`. This will ensure that the correct Azure Government Cloud endpoints are used. You will also need to set the `location` variable to a valid Azure Government Cloud location. For more information on Azure Government Cloud, see the [Azure Government](https://docs.microsoft.com/en-us/azure/azure-government/documentation-government-get-started) documentation.
+Since this module is built for both public and us government clouds. The `environment` variable defaults to `public` for Azure Cloud. When using this module with the Azure Government Cloud, you must set the `environment` variable to `usgovernment`. You will also need to set the azurerm provider `environment` variable to the proper cloud as well. This will ensure that the correct Azure Government Cloud endpoints are used. You will also need to set the `location` variable to a valid Azure Government Cloud location.
+
+Example Usage for Azure Government Cloud:
+
+```hcl
+
+provider "azurerm" {
+  environment = "usgovernment"
+}
+
+module "overlays-management-spoke" {
+  source  = "azurenoops/overlays-management-spoke/azurerm"
+  version = "2.0.0"
+  
+  location = "usgovvirginia"
+  environment = "usgovernment"
+  ...
+}
+
+```
 
 ## SCCA Compliance
 
