@@ -4,8 +4,6 @@
 
 This Overlay terraform module deploys a Management Spoke network using the [Microsoft recommended Hub-Spoke network topology](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke) to be used in a [SCCA compliant Management Network](https://registry.terraform.io/modules/azurenoops/overlays-management-spoke/azurerm/latest). Usually, only one hub in each region with multiple spokes and each of them can also be in separate subscriptions.
 
->If you are deploying the spoke VNet in the same Hub Management Network subscription, then make sure you have set the argument `is_spoke_deployed_to_same_hub_subscription = true`. This helps this module to manage the network watcher, flow logs and traffic analytics resources for all the subnets in the Virtual Network. If you are deploying the spoke virtual networks in separate subscriptions, then set this argument to `false`.
-
 This is designed to quickly deploy hub and spoke architecture in the azure and further security hardening would be recommend to add appropriate NSG rules to use this for any production workloads.
 
 ## Using Azure Clouds
@@ -118,9 +116,6 @@ module "vnet-spoke" {
   # Provide valid VNet Address space for spoke virtual network.    
   virtual_network_address_space = ["10.0.100.0/24"] # (Required)  Hub Virtual Network Parameters
    
-  # (Required) Specify if you are deploying the spoke VNet using the same hub Azure subscription
-  is_spoke_deployed_to_same_hub_subscription = true  
-
   # (Required) Multiple Subnets, Service delegation, Service Endpoints, Network security groups
   # These are default subnets with required configuration, check README.md for more details
   # Route_table and NSG association to be added automatically for all subnets listed here.
