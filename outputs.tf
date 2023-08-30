@@ -37,18 +37,27 @@ output "virtual_network_address_space" {
 }
 
 output "subnet_ids" {
-  description = "List of IDs of subnets"
-  value       = flatten(concat([for s in azurerm_subnet.default_snet : s.id]))
+  description = "Map of IDs of subnets"
+  value = { for key, name in zipmap(
+    sort(keys(var.spoke_subnets)),
+    sort(values(azurerm_subnet.default_snet)[*]["id"])) :
+  key => { key = key, name = name } }
 }
 
 output "subnet_names" {
-  description = "List of names of subnets"
-  value       = flatten(concat([for s in azurerm_subnet.default_snet : s.name]))
+  description = "Map of names of subnets"
+  value = { for key, name in zipmap(
+    sort(keys(var.spoke_subnets)),
+    sort(values(azurerm_subnet.default_snet)[*]["name"])) :
+  key => { key = key, name = name } }
 }
 
 output "subnet_address_prefixes" {
-  description = "List of address prefix for subnets"
-  value       = flatten(concat([for s in azurerm_subnet.default_snet : s.address_prefixes]))
+  description = "Map of address prefix of subnets"
+  value = { for key, name in zipmap(
+    sort(keys(var.spoke_subnets)),
+    sort(values(azurerm_subnet.default_snet)[*]["address_prefixes"])) :
+  key => { key = key, name = name } }
 }
 
 # Network Security group ids
@@ -65,7 +74,7 @@ output "ddos_protection_plan_id" {
 
 output "network_watcher_id" {
   description = "ID of Network Watcher"
-  value       = var.is_spoke_deployed_to_same_hub_subscription == false ? element(concat(azurerm_network_watcher.nwatcher.*.id, [""]), 0) : null
+  value       = data.azurerm_network_watcher.nwatcher.id
 }
 
 output "route_table_name" {
@@ -80,12 +89,12 @@ output "route_table_id" {
 
 output "private_dns_zone_names" {
   description = "The name of the Private DNS zones within Azure DNS"
-  value       = [for s in module.mod_pdz : s.private_dns_zone_name] 
+  value       = [for s in module.mod_pdz : s.private_dns_zone_name]
 }
 
 output "private_dns_zone_ids" {
   description = "The resource id of Private DNS zones within Azure DNS"
-  value       = [for s in module.mod_pdz : s.private_dns_zone_id] 
+  value       = [for s in module.mod_pdz : s.private_dns_zone_id]
 }
 
 output "storage_account_id" {
