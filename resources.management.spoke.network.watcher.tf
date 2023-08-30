@@ -9,21 +9,12 @@ AUTHOR/S: jspinella
 */
 
 #-------------------------------------
-# Network Watcher - Default is "true"
+# Network Watcher 
 #-------------------------------------
-resource "azurerm_resource_group" "nwatcher" {
-  count    = var.is_spoke_deployed_to_same_hub_subscription == false ? 1 : 0
-  name     = "NetworkWatcherRG"
-  location = local.location
-  tags     = merge({ "ResourceName" = "NetworkWatcherRG" }, local.default_tags, var.add_tags, )
-}
-
-resource "azurerm_network_watcher" "nwatcher" {
-  count               = var.is_spoke_deployed_to_same_hub_subscription == false ? 1 : 0
-  name                = "NetworkWatcher_${var.location}"
-  location            = local.location
-  resource_group_name = azurerm_resource_group.nwatcher.0.name
-  tags                = merge({ "ResourceName" = format("%s", "NetworkWatcher_${var.location}") }, local.default_tags, var.add_tags, )
+data "azurerm_network_watcher" "nwatcher" {
+  depends_on          = [azurerm_virtual_network.spoke_vnet]
+  name                = "NetworkWatcher_${local.location}"
+  resource_group_name = data.azurerm_resource_group.netwatch.name
 }
 
 #-----------------------------------------
@@ -32,8 +23,8 @@ resource "azurerm_network_watcher" "nwatcher" {
 resource "azurerm_network_watcher_flow_log" "nwflog" {
   for_each                  = var.spoke_subnets
   name                      = lower("Network-Watcher-flog-log-${each.value.name}")
-  network_watcher_name      = var.is_spoke_deployed_to_same_hub_subscription == true ? "NetworkWatcher_${local.netwatcher_rg_location}" : azurerm_network_watcher.nwatcher.0.name
-  resource_group_name       = local.netwatcher_rg_name # Must provide Netwatcher resource Group
+  network_watcher_name      = data.azurerm_network_watcher.nwatcher.name
+  resource_group_name       = "NetworkWatcherRG" # Must provide Netwatcher resource Group
   network_security_group_id = azurerm_network_security_group.nsg[each.key].id
   storage_account_id        = module.mgt_storage_account_spoke.storage_account_id
   enabled                   = true
