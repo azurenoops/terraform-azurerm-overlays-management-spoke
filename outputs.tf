@@ -53,11 +53,8 @@ output "subnet_names" {
 }
 
 output "subnet_address_prefixes" {
-  description = "Map of address prefix of subnets"
-  value = { for key, name in zipmap(
-    sort(keys(var.spoke_subnets)),
-    sort(values(azurerm_subnet.default_snet)[*]["address_prefixes"])) :
-  key => { key = key, name = name } }
+  description = "List of address prefix for subnets"
+  value       = flatten(concat([for s in azurerm_subnet.default_snet : s.address_prefixes]))
 }
 
 # Network Security group ids
