@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 # Azurerm provider configuration
 provider "azurerm" {
   features {}
@@ -5,8 +8,8 @@ provider "azurerm" {
 
 module "mod_vnet_spoke" {
   #source  = "azurenoops/overlays-management-spoke/azurerm"
-  #version = ">= 2.0.0"
-  source = "../.."
+  #version = "~> 2.0"
+  source = "../../.."
 
   # By default, this module will create a resource group, provide the name here
   # To use an existing resource group, specify the existing resource group name, 
@@ -33,9 +36,6 @@ module "mod_vnet_spoke" {
 
   # Provide valid VNet Address space for spoke virtual network.    
   virtual_network_address_space = ["10.8.6.0/24"] # (Required)  Spoke Virtual Network Parameters
-
-  # (Required) Specify if you are deploying the spoke VNet using the same hub Azure subscription
-  is_spoke_deployed_to_same_hub_subscription = true
 
   # (Required) Multiple Subnets, Service delegation, Service Endpoints, Network security groups
   # These are default subnets with required configuration, check README.md for more details

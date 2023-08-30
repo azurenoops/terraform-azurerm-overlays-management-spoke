@@ -34,9 +34,6 @@ module "mod_vnet_ops_spoke" {
   # Provide valid VNet Address space for spoke virtual network.    
   virtual_network_address_space = ["10.8.7.0/24"] # (Required)  Spoke Virtual Network Parameters
 
-  # (Required) Specify if you are deploying the spoke VNet using the same hub Azure subscription
-  is_spoke_deployed_to_same_hub_subscription = true
-
   # (Required) Multiple Subnets, Service delegation, Service Endpoints, Network security groups
   # These are default subnets with required configuration, check README.md for more details
   # Route_table and NSG association to be added automatically for all subnets listed here.
@@ -108,9 +105,6 @@ module "mod_vnet_svcs_spoke" {
 
   # Provide valid VNet Address space for spoke virtual network.    
   virtual_network_address_space = ["10.8.8.0/24"] # (Required)  Spoke Virtual Network Parameters
-
-  # (Required) Specify if you are deploying the spoke VNet using the same hub Azure subscription
-  is_spoke_deployed_to_same_hub_subscription = true
 
   # (Required) Multiple Subnets, Service delegation, Service Endpoints, Network security groups
   # These are default subnets with required configuration, check README.md for more details
