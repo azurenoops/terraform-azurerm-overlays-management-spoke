@@ -30,8 +30,3 @@ variable "create_network_watcher" {
   description = "Controls if Network Watcher resources should be created for the Azure subscription"
   default     = false
 }
-
-variable "is_spoke_deployed_to_same_hub_subscription" {
-  description = "Indicates if the spoke is deployed to the same subscription as the hub. Default is true."
-  default     = true
-}
