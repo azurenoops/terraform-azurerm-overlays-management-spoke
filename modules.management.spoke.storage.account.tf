@@ -7,7 +7,7 @@
 module "mgt_storage_account_spoke" {
   depends_on = [ module.mod_scaffold_rg ]
   source                       = "azurenoops/overlays-storage-account/azurerm"
-  version                      = ">= 0.1.0"
+  version                      = "~> 1.0"
   existing_resource_group_name = local.resource_group_name
   storage_account_custom_name  = local.spoke_sa_name
   location                     = local.location
