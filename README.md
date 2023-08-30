@@ -4,7 +4,7 @@
 
 This Overlay terraform module deploys a Management Spoke network using the [Microsoft recommended Hub-Spoke network topology](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke) to be used in a [SCCA compliant Management Network](https://registry.terraform.io/modules/azurenoops/overlays-management-spoke/azurerm/latest). Usually, only one hub in each region with multiple spokes and each of them can also be in separate subscriptions.
 
-This is designed to quickly deploy hub and spoke architecture in the azure and further security hardening would be recommend to add appropriate NSG rules to use this for any production workloads.
+This is designed to quickly deploy hub and spoke architecture in Azure and further security hardening would be recommend to add appropriate NSG rules to use this for any production workloads.
 
 ## Using Azure Clouds
 
@@ -28,6 +28,41 @@ module "overlays-management-spoke" {
 }
 
 ```
+
+### Resource Provider List
+
+Terraform requires the following resource providers to be available:
+
+- Microsoft.Network
+- Microsoft.Storage
+- Microsoft.Compute
+- Microsoft.KeyVault
+- Microsoft.Authorization
+- Microsoft.Resources
+- Microsoft.OperationalInsights
+- Microsoft.GuestConfiguration
+- Microsoft.Insights
+- Microsoft.Advisor
+- Microsoft.Security
+- Microsoft.OperationsManagement
+- Microsoft.AAD
+- Microsoft.AlertsManagement
+- Microsoft.Authorization
+- Microsoft.AnalysisServices
+- Microsoft.Automation
+- Microsoft.Subscription
+- Microsoft.Support
+- Microsoft.PolicyInsights
+- Microsoft.SecurityInsights
+- Microsoft.Security
+- Microsoft.Monitor
+- Microsoft.Management
+- Microsoft.ManagedServices
+- Microsoft.ManagedIdentity
+- Microsoft.Billing
+- Microsoft.Consumption
+
+Please note that some of the resource providers may not  be available in Azure Government Cloud. Please check the [Azure Government Cloud documentation](https://docs.microsoft.com/en-us/azure/azure-government/documentation-government-get-started-connect-with-cli) for more information.
 
 ## SCCA Compliance
 

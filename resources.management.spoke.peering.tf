@@ -14,7 +14,7 @@ provider "azurerm" {
   alias           = "hub_network"
   subscription_id = element(split("/", var.hub_virtual_network_id), 2)
   environment     = var.environment
-  skip_provider_registration = var.environment == "usgovernment" ? true : false # Terraform auto registers more providers need by this module. Please see list of provider that are needed.
+  skip_provider_registration = var.environment == "usgovernment" ? true : false # Terraform auto registers more providers than are needed by this module. Please see list of provider that are needed in the readne file.
   features {}
 }
 
