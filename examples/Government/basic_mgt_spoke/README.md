@@ -134,6 +134,8 @@ enable_forced_tunneling_on_id_route_table = true
 
 To run this example you need to execute following Terraform commands
 
+> Note: When running terraform commands against Azure Government, you will need to set the environment variable `export ARM_ENVIRONMENT=usgovernment` to ensure the AzureRM provider is using the Azure Government API endpoints.
+
 ```hcl
 terraform init
 terraform plan --var-file=parameters.tfvars --out dev.plan

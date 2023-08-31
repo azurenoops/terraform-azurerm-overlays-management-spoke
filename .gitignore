@@ -7,6 +7,8 @@ terraform.tfvars
 *.tfstate
 *.tfstate.backup
 *.tfvars
+*.tfplan
+*.plan
 
 **/.terraform.lock.hcl
 
@@ -83,3 +85,4 @@ test/go.sum
 *.plan
 *.tfplan
 
+examples/Government/basic_mgt_spoke/README.md
