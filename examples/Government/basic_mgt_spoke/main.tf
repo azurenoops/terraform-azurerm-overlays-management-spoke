@@ -26,7 +26,7 @@ module "mod_vnet_spoke" {
   enable_traffic_analytics = var.enable_traffic_analytics
 
   # (Required) To enable Azure Monitoring and flow logs
-  # pick the values for log analytics workspace which created by Spoke module
+  # pick the values for log analytics workspace which created by Hub module
   # Possible values range between 30 and 730
   log_analytics_workspace_id           = data.azurerm_log_analytics_workspace.hub-logws.id
   log_analytics_customer_id            = data.azurerm_log_analytics_workspace.hub-logws.workspace_id
