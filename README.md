@@ -137,9 +137,9 @@ module "vnet-spoke" {
 
   # Collect Hub Virtual Network Parameters
   # Hub network details to create peering and other setup
-  hub_virtual_network_id          = data.azurerm_virtual_network.hub-vnet.id
-  hub_firewall_private_ip_address = "10.0.100.4"  
-  hub_storage_account_id          = data.azurerm_storage_account.hub-st.id
+  hub_virtual_network_name        = data.azurerm_virtual_network.hub-vnet.name
+  hub_firewall_private_ip_address = data.azurerm_firewall.hub-fw.ip_configuration[0].private_ip_address
+  hub_resource_group_name         = data.azurerm_virtual_network.hub-vnet.resource_group_name
 
   # (Required) To enable Azure Monitoring and flow logs
   # pick the values for log analytics workspace which created by Hub module
