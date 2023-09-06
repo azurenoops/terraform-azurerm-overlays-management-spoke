@@ -16,8 +16,8 @@ module "mod_vnet_spoke" {
   environment                 = var.environment
   workload_name               = var.id_name
 
-  # Collect Spoke Virtual Network Parameters
-  # Spoke network details to create peering and other setup
+  # Collect Hub Virtual Network Parameters
+  # Hub network details to create peering and other setup
   hub_virtual_network_name        = data.azurerm_virtual_network.hub-vnet.name
   hub_firewall_private_ip_address = data.azurerm_firewall.hub-fw.ip_configuration[0].private_ip_address
   hub_resource_group_name         = data.azurerm_virtual_network.hub-vnet.resource_group_name
