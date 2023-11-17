@@ -5,7 +5,7 @@
 SUMMARY: Module Example to deploy an Private DNS Zones to a spoke 
 DESCRIPTION: The following components will be options in this deployment
             * Private DNS Zones 
-AUTHOR/S: jspinella
+AUTHOR/S: jrspinella
 */
 
 #----------------------------------------

@@ -2,10 +2,10 @@
 # Licensed under the MIT License.
 
 /*
-SUMMARY: Terraform Module to deploy the Network Watcher and Flog Logs for Managment Spoke Network based on the Azure Mission Landing Zone conceptual architecture
+SUMMARY: Terraform Module to deploy the Network Watcher and Flog Logs for Management Spoke Network based on the Azure Mission Landing Zone conceptual architecture
 DESCRIPTION: The following components will be options in this deployment              
               * Network Watcher         
-AUTHOR/S: jspinella
+AUTHOR/S: jrspinella
 */
 
 #-------------------------------------

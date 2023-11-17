@@ -99,7 +99,7 @@ variable "virtual_network_name" {
 #####################################
 
 variable "hub_virtual_network_name" {
-  description = "The name of hub virutal network"
+  description = "The name of hub virtual network"
   default     = null
 }
 
