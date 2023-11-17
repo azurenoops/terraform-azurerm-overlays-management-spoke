@@ -2,12 +2,12 @@
 # Licensed under the MIT License.
 
 /*
-SUMMARY: Module to deploy a route table in the Managment Spoke Network based on the Azure Mission Landing Zone conceptual architecture
+SUMMARY: Module to deploy a route table in the Management Spoke Network based on the Azure Mission Landing Zone conceptual architecture
 DESCRIPTION: The following components will be options in this deployment
               * Route Table
                 * Route Table Association
                 * Route     
-AUTHOR/S: jspinella
+AUTHOR/S: jrspinella
 */
 
 resource "azurerm_route_table" "routetable" {
