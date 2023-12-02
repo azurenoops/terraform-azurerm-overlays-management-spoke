@@ -10,7 +10,7 @@ variable "environment" {
 }
 
 variable "deploy_environment" {
-  description = "Name of the workload's environnement (dev, test, prod, etc). This will be used to name the resources deployed by this module. default is 'dev'"
+  description = "Name of the workload's environment (dev, test, prod, etc). This will be used to name the resources deployed by this module. default is 'dev'"
   type        = string
 }
 
