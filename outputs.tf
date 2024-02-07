@@ -38,10 +38,10 @@ output "virtual_network_address_space" {
 
 output "subnet_ids" {
   description = "Map of IDs of subnets"
-  value = { for key, name in zipmap(
+  value = { for key, id in zipmap(
     sort(keys(var.spoke_subnets)),
     sort(values(azurerm_subnet.default_snet)[*]["id"])) :
-  key => { key = key, name = name } }
+  key => { key = key, name = id } }
 }
 
 output "subnet_names" {
