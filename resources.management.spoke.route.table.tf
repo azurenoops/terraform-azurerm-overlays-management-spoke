@@ -37,7 +37,7 @@ resource "azurerm_route" "force_internet_tunneling" {
 
 resource "azurerm_route" "route" {
   for_each               = var.route_table_routes
-  name                   = lower("route-to-firewall-${each.value.route_name}-${local.location}")
+  name                   = lower("route-to-firewall-${each.value.name}-${local.location}")
   resource_group_name    = local.resource_group_name
   route_table_name       = azurerm_route_table.routetable.name
   address_prefix         = each.value.address_prefix
