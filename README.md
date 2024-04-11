@@ -21,7 +21,7 @@ provider "azurerm" {
 module "overlays-management-spoke" {
   source  = "azurenoops/overlays-management-spoke/azurerm"
   version = "2.0.0"
-  
+
   location = "usgovvirginia"
   environment = "usgovernment"
   ...
@@ -84,19 +84,17 @@ The following reference architecture shows how to implement a SCCA compliant hub
 
 These types of resources are supported:
 
-* [Virtual Network](https://www.terraform.io/docs/providers/azurerm/r/virtual_network.html)
-* [Subnets](https://www.terraform.io/docs/providers/azurerm/r/subnet.html)
-* [Subnet Service Delegation](https://www.terraform.io/docs/providers/azurerm/r/subnet.html#delegation)
-* [Virtual Network service endpoints](https://www.terraform.io/docs/providers/azurerm/r/subnet.html#service_endpoints)
-* [Private Link service/Endpoint network policies on Subnet](https://www.terraform.io/docs/providers/azurerm/r/subnet.html#enforce_private_link_endpoint_network_policies)
-* [AzureNetwork DDoS Protection Plan](https://www.terraform.io/docs/providers/azurerm/r/network_ddos_protection_plan.html)
-* [Network Security Groups](https://www.terraform.io/docs/providers/azurerm/r/network_security_group.html)
-* [Routing traffic to Hub firewall](https://www.terraform.io/docs/providers/azurerm/r/route_table.html)
-* [Peering to Hub Network](https://www.terraform.io/docs/providers/azurerm/r/role_assignment.html)
-* [Azure Monitoring Diagnostics](https://www.terraform.io/docs/providers/azurerm/r/monitor_diagnostic_setting.html)
-* [Network Watcher](https://www.terraform.io/docs/providers/azurerm/r/network_watcher.html)
-* [Network Watcher Workflow Logs](https://www.terraform.io/docs/providers/azurerm/r/network_watcher_flow_log.html)
-* [Linking Hub Private DNS Zone](https://www.terraform.io/docs/providers/azurerm/r/private_dns_zone.html)
+- [Virtual Network](https://www.terraform.io/docs/providers/azurerm/r/virtual_network.html)
+- [Subnets](https://www.terraform.io/docs/providers/azurerm/r/subnet.html)
+- [Subnet Service Delegation](https://www.terraform.io/docs/providers/azurerm/r/subnet.html#delegation)
+- [Virtual Network service endpoints](https://www.terraform.io/docs/providers/azurerm/r/subnet.html#service_endpoints)
+- [Private Link service/Endpoint network policies on Subnet](https://www.terraform.io/docs/providers/azurerm/r/subnet.html#enforce_private_link_endpoint_network_policies)
+- [AzureNetwork DDoS Protection Plan](https://www.terraform.io/docs/providers/azurerm/r/network_ddos_protection_plan.html)
+- [Network Security Groups](https://www.terraform.io/docs/providers/azurerm/r/network_security_group.html)
+- [Routing traffic to Hub firewall](https://www.terraform.io/docs/providers/azurerm/r/route_table.html)
+- [Azure Monitoring Diagnostics](https://www.terraform.io/docs/providers/azurerm/r/monitor_diagnostic_setting.html)
+- [Network Watcher](https://www.terraform.io/docs/providers/azurerm/r/network_watcher.html)
+- [Network Watcher Workflow Logs](https://www.terraform.io/docs/providers/azurerm/r/network_watcher_flow_log.html)
 
 ## Module Usage
 
@@ -126,7 +124,7 @@ module "vnet-spoke" {
   version = "2.0.0"
 
   # By default, this module will create a resource group, provide the name here
-  # To use an existing resource group, specify the existing resource group name, 
+  # To use an existing resource group, specify the existing resource group name,
   # and set the argument to `create_resource_group = false`. Location will be same as existing RG.
   create_resource_group = true
   location              = "eastus"
@@ -135,22 +133,26 @@ module "vnet-spoke" {
   environment           = "public"
   workload_name         = "id-core"
 
-  # Collect Hub Virtual Network Parameters
-  # Hub network details to create peering and other setup
-  hub_virtual_network_name        = data.azurerm_virtual_network.hub-vnet.name
-  hub_firewall_private_ip_address = data.azurerm_firewall.hub-fw.ip_configuration[0].private_ip_address
-  hub_resource_group_name         = data.azurerm_virtual_network.hub-vnet.resource_group_name
+  # (Required) Collect Hub Virtual Network Parameters
+  # Hub network details
+  existing_hub_resource_group_name  = data.azurerm_virtual_network.hub-vnet.resource_group_name
+  existing_hub_virtual_network_name = data.azurerm_virtual_network.hub-vnet.name
+  existing_hub_firewall_name        = data.azurerm_firewall.hub-fw.name
+
+  # pick the value for log analytics resource if which created by hub module
+  existing_log_analytics_workspace_resource_name = data.azurerm_log_analytics_workspace.hub-logws.resource_group_name
+  existing_log_analytics_workspace_name          = data.azurerm_log_analytics_workspace.hub-logws.name
+
+  # DNS Resource Group
+  private_dns_zone_hub_resource_group_name = data.azurerm_resource_group.dns.name
 
   # (Required) To enable Azure Monitoring and flow logs
-  # pick the values for log analytics workspace which created by Hub module
-  # Possible values range between 30 and 730
-  log_analytics_workspace_id           = data.azurerm_log_analytics_workspace.hub-logws.id
-  log_analytics_customer_id            = data.azurerm_log_analytics_workspace.hub-logws.workspace_id
-  log_analytics_logs_retention_in_days = 30
+  # To enable traffic analytics, set `enable_traffic_analytics = true` in the module.
+  enable_traffic_analytics = var.enable_traffic_analytics
 
-  # Provide valid VNet Address space for spoke virtual network.    
+  # Provide valid VNet Address space for spoke virtual network.
   virtual_network_address_space = ["10.0.100.0/24"] # (Required)  Hub Virtual Network Parameters
-   
+
   # (Required) Multiple Subnets, Service delegation, Service Endpoints, Network security groups
   # These are default subnets with required configuration, check README.md for more details
   # Route_table and NSG association to be added automatically for all subnets listed here.
@@ -166,20 +168,15 @@ module "vnet-spoke" {
   }
 
   # By default, forced tunneling is enabled for the spoke.
-  # If you do not want to enable forced tunneling on the spoke route table, 
+  # If you do not want to enable forced tunneling on the spoke route table,
   # set `enable_forced_tunneling = false`.
   enable_forced_tunneling_on_route_table = true
 
-  # Private DNS Zone Settings
-  # By default, Azure NoOps will create Private DNS Zones for Logging in Hub VNet.
-  # If you do want to create additional Private DNS Zones, 
-  # add in the list of private_dns_zones to be created.
-  # else, remove the private_dns_zones argument.
-  private_dns_zones_to_link_to_hub = ["privatelink.file.core.windows.net"]  
-
-  # By default, this will apply resource locks to all resources created by this module.
+  # (Optional) By default, this will apply resource locks to all resources created by this module.
   # To disable resource locks, set the argument to `enable_resource_locks = false`.
-  enable_resource_locks = false
+  # lock_level can be set to CanNotDelete or ReadOnly
+  enable_resource_locks = var.enable_resource_locks
+  lock_level            = var.lock_level
 
   # Tags
   add_tags = {
@@ -200,7 +197,7 @@ Parameter name | Location | Default Value | Description
 
 ## Subnets
 
-This module handles the creation and a list of address spaces for subnets. This module uses `for_each` to create subnets and corresponding service endpoints, service delegation, and network security groups. This module associates the subnets to network security groups as well with additional user-defined NSG rules.  
+This module handles the creation and a list of address spaces for subnets. This module uses `for_each` to create subnets and corresponding service endpoints, service delegation, and network security groups. This module associates the subnets to network security groups as well with additional user-defined NSG rules.
 
 This module creates 1 subnets by default: Default Subnet
 
@@ -223,7 +220,7 @@ module "vnet-spoke" {
       subnet_name           = "default"
       subnet_address_prefix = "10.1.2.0/24"
 
-      service_endpoints     = ["Microsoft.Storage"]  
+      service_endpoints     = ["Microsoft.Storage"]
     }
   }
 
@@ -292,8 +289,8 @@ module "vnet-spoke" {
   }
 
 # ....omitted
-  
-  } 
+
+  }
 ```
 
 ## `private_link_service_network_policies_enabled` - private link service on the subnet
@@ -394,7 +391,7 @@ By default, this module will not create a DDoS Protection Plan. You can enable/d
 
 This module handle the provision of Network Watcher resource by defining `create_network_watcher` variable. It will enable network watcher, flow logs and traffic analytics for all the subnets in the Virtual Network. Since Azure uses a specific naming standard on network watchers, It will create a resource group `NetworkWatcherRG` and adds the location specific resource.
 
-> **Note:** *Log Analytics workspace is required for NSG Flow Logs and Traffic Analytics. If you want to enable NSG Flow Logs and Traffic Analytics, you must create a Log Analytics workspace and provide the workspace name set argument `log_analytics_workspace_name` and rg set argument `log_analytics_workspace_resource_group_name`*
+> **Note:*-*Log Analytics workspace is required for NSG Flow Logs and Traffic Analytics. If you want to enable NSG Flow Logs and Traffic Analytics, you must create a Log Analytics workspace and provide the workspace name set argument `log_analytics_workspace_name` and rg set argument `log_analytics_workspace_resource_group_name`*
 
 ## Enable Force Tunneling for the Firewall
 
@@ -404,21 +401,17 @@ By default, this module will not create a force tunnel on the firewall. You can 
 
 This is an optional feature and only applicable if you are using your own DNS servers superseding default DNS services provided by Azure.Set the argument `dns_servers = ["4.4.4.4"]` to enable this option. For multiple DNS servers, set the argument `dns_servers = ["4.4.4.4", "8.8.8.8"]`
 
-## Linking Hub Private DNS Zone
-
-This module facilitates to link the spoke VNet to private DNS preferably created by Spoke Module. To create a link to private DNS zone, set the domain name of the private DNS zone with variable `private_dns_zones`. If you want to link multiple private DNS zones, set the argument `private_dns_zones = ["privatelink.blob.core.windows.net", "privatelink.file.core.windows.net"]`  
-
 ## Recommended naming and tagging conventions
 
 Applying tags to your Azure resources, resource groups, and subscriptions to logically organize them into a taxonomy. Each tag consists of a name and a value pair. For example, you can apply the name `Environment` and the value `Production` to all the resources in production.
 For recommendations on how to implement a tagging strategy, see Resource naming and tagging decision guide.
 
->**Important** :
+>**Important*-:
 Tag names are case-insensitive for operations. A tag with a tag name, regardless of the casing, is updated or retrieved. However, the resource provider might keep the casing you provide for the tag name. You'll see that casing in cost reports. **Tag values are case-sensitive.**
 
 An effective naming convention assembles resource names by using important resource information as parts of a resource's name. For example, using these [recommended naming conventions](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/naming-and-tagging#example-names), a public IP resource for a production SharePoint workload is named like this: `pip-sharepoint-prod-westus-001`.
 
 ## Other resources
 
-* [Hub-spoke network topology in Azure](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke)
-* [Terraform AzureRM Provider Documentation](https://www.terraform.io/docs/providers/azurerm/index.html)
+-[Hub-spoke network topology in Azure](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke)
+-[Terraform AzureRM Provider Documentation](https://www.terraform.io/docs/providers/azurerm/index.html)
