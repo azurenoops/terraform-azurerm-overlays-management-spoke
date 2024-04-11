@@ -27,11 +27,11 @@ enable_traffic_analytics = true
 
 # Identity Virtual Network Parameters
 id_name               = "id"
-id_vnet_address_space = ["10.8.9.0/24"]
+id_vnet_address_space = ["10.8.10.0/24"]
 id_subnets = {
   default = {
     name                                       = "id"
-    address_prefixes                           = ["10.8.9.224/27"]
+    address_prefixes                           = ["10.8.10.224/27"]
     service_endpoints                          = ["Microsoft.Storage"]
     private_endpoint_network_policies_enabled  = false
     private_endpoint_service_endpoints_enabled = true
@@ -46,15 +46,11 @@ id_subnets = {
         source_port_range          = "*",
         destination_port_ranges    = ["22", "80", "443", "3389"],
         source_address_prefixes    = ["10.8.6.0/24", "10.8.7.0/24", "10.8.8.0/24"],
-        destination_address_prefix = "10.8.9.0/24"
+        destination_address_prefix = "10.8.10.0/24"
       }
     ]
   }
 }
-
-# Private DNS Zones
-# Add in the list of private_dns_zones to be created.
-id_private_dns_zones = []
 
 # Enable forced tunneling on the route table
 enable_forced_tunneling_on_id_route_table = true

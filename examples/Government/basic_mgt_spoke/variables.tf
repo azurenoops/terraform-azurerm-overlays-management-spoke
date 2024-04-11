@@ -38,6 +38,11 @@ variable "disable_base_module_tags" {
   default     = false
 }
 
+variable "subscription_id" {
+  type        = string
+  description = "The subscription ID to use for the resources deployed by this module."
+}
+
 #################################
 # Resource Lock Configuration
 #################################
@@ -85,14 +90,9 @@ variable "enable_forced_tunneling_on_id_route_table" {
   default     = true
 }
 
-variable "id_private_dns_zones" {
-  description = "The private DNS zones of the operations virtual network."
-  type        = list(string)
-  default     = []
-}
-
 variable "enable_traffic_analytics" {
   description = "Enable Traffic Analytics for NSG Flow Logs"
   type        = bool
   default     = false
 }
+

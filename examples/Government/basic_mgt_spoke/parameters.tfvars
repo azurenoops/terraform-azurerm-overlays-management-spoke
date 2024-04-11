@@ -55,10 +55,6 @@ id_subnets = {
   }
 }
 
-# Private DNS Zones
-# Add in the list of private_dns_zones to be created.
-id_private_dns_zones = []
-
 # Enable forced tunneling on the route table
 enable_forced_tunneling_on_id_route_table = true
 
