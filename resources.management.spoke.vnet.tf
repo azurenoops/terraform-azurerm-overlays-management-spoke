@@ -4,42 +4,68 @@
 /*
 SUMMARY: Terraform Module to deploy the Management Spoke Network based on the Azure Mission Landing Zone conceptual architecture
 DESCRIPTION: The following components will be options in this deployment
-              * Management Spoke Network Virtual Network    
+              * Management Spoke Network Virtual Network
               * Ddos Protection Plan
-              * Network Watcher         
+              * Network Watcher
 AUTHOR/S: jrspinella
 */
 
 #-------------------------------------
 # VNET Creation - Default is "true"
 #-------------------------------------
-resource "azurerm_virtual_network" "spoke_vnet" {
+module "spoke_vnet" {
+  source  = "azure/avm-res-network-virtualnetwork/azurerm"
+  version = "0.1.4"
+
+  # Resource Group
   name                = local.spoke_vnet_name
   resource_group_name = local.resource_group_name
   location            = local.location
-  address_space       = var.virtual_network_address_space
-  dns_servers         = var.dns_servers
-  tags                = merge({ "ResourceName" = format("%s", local.spoke_vnet_name) }, local.default_tags, var.add_tags, )
 
-  dynamic "ddos_protection_plan" {
-    for_each = local.if_ddos_enabled
-
-    content {
-      id     = azurerm_network_ddos_protection_plan.ddos[0].id
-      enable = true
-    }
+  # Virtual Network DNS Servers
+  virtual_network_dns_servers = {
+    dns_servers = var.dns_servers
   }
+
+  # Virtual Network Address Space
+  virtual_network_address_space = var.virtual_network_address_space
+
+  # Ddos protection plan - Default is "false"
+  virtual_network_ddos_protection_plan = var.create_ddos_plan ? {
+    enable = true
+    id     = module.mod_spoke_vnet_ddos[0].resource.id
+  } : null
+
+  # Resource Lock
+  lock = var.enable_resource_locks ? {
+    name = "${local.spoke_vnet_name}-${var.lock_level}-lock"
+    kind = var.lock_level
+  } : null
+
+   # telemtry
+  enable_telemetry = var.disable_telemetry
+
+  # Tags
+  tags = merge({ "ResourceName" = format("%s", local.spoke_vnet_name) }, local.default_tags, var.add_tags, )
 }
 
 #--------------------------------------------
 # Ddos protection plan - Default is "false"
 #--------------------------------------------
-
-resource "azurerm_network_ddos_protection_plan" "ddos" {
+module "mod_spoke_vnet_ddos" {
+  source              = "azure/avm-res-network-ddosprotectionplan/azurerm"
+  version             = "0.1.0"
   count               = var.create_ddos_plan ? 1 : 0
-  name                = var.ddos_plan_name
+  name                = local.ddos_plan_name
   resource_group_name = local.resource_group_name
   location            = local.location
-  tags                = merge({ "ResourceName" = format("%s", var.ddos_plan_name) }, local.default_tags, var.add_tags, )
+
+  # Resource Lock
+  lock = var.enable_resource_locks ? {
+    name = "${local.ddos_plan_name}-${var.lock_level}-lock"
+    kind = var.lock_level
+  } : null
+
+  tags = merge({ "ResourceName" = format("%s", local.ddos_plan_name) }, local.default_tags, var.add_tags, )
 }
 

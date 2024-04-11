@@ -16,6 +16,11 @@ variable "spoke_storage_account_tier" {
 variable "spoke_storage_account_replication_type" {
   description = "The Replication Type of storage account to create. Valid options are LRS, GRS, RAGRS, ZRS, GZRS, RAGZRS."
   type        = string
-  default     = "GRS"
+  default     = "ZRS"
 }
 
+variable "spoke_storage_bypass_ip_cidr" {
+  description = "List of IP CIDRs that are allowed to bypass the network rules for the Spoke Storage Account. Default is empty."
+  type        = list(string)
+  default     = []
+}
