@@ -3,11 +3,11 @@
 
 module "mod_vnet_spoke" {
   #source  = "azurenoops/overlays-management-spoke/azurerm"
-  #version = "~> 2.0"
+  #version = "~> x.x.x"
   source = "../../.."
 
   # By default, this module will create a resource group, provide the name here
-  # To use an existing resource group, specify the existing resource group name, 
+  # To use an existing resource group, specify the existing resource group name,
   # and set the argument to `create_resource_group = false`. Location will be same as existing RG.
   create_spoke_resource_group = true
   location                    = var.default_location
@@ -16,23 +16,24 @@ module "mod_vnet_spoke" {
   environment                 = var.environment
   workload_name               = var.id_name
 
-  # Collect Hub Virtual Network Parameters
-  # Hub network details to create peering and other setup
-  hub_virtual_network_name        = data.azurerm_virtual_network.hub-vnet.name
-  hub_firewall_private_ip_address = data.azurerm_firewall.hub-fw.ip_configuration[0].private_ip_address
-  hub_resource_group_name         = data.azurerm_virtual_network.hub-vnet.resource_group_name
+   # (Required) Collect Hub Virtual Network Parameters
+  # Hub network details
+  existing_hub_resource_group_name  = data.azurerm_virtual_network.hub-vnet.resource_group_name
+  existing_hub_virtual_network_name = data.azurerm_virtual_network.hub-vnet.name
+  existing_hub_firewall_name        = data.azurerm_firewall.hub-fw.name
 
+  # pick the value for log analytics resource if which created by hub module
+  existing_log_analytics_workspace_resource_name = data.azurerm_log_analytics_workspace.hub-logws.resource_group_name
+  existing_log_analytics_workspace_name          = data.azurerm_log_analytics_workspace.hub-logws.name
+
+  # DNS Resource Group
+  private_dns_zone_hub_resource_group_name = data.azurerm_resource_group.dns.name
+
+  # (Required) To enable Azure Monitoring and flow logs
   # To enable traffic analytics, set `enable_traffic_analytics = true` in the module.
   enable_traffic_analytics = var.enable_traffic_analytics
 
-  # (Required) To enable Azure Monitoring and flow logs
-  # pick the values for log analytics workspace which created by Hub module
-  # Possible values range between 30 and 730
-  log_analytics_workspace_id           = data.azurerm_log_analytics_workspace.hub-logws.id
-  log_analytics_customer_id            = data.azurerm_log_analytics_workspace.hub-logws.workspace_id
-  log_analytics_logs_retention_in_days = 30
-
-  # Provide valid VNet Address space for spoke virtual network.    
+  # Provide valid VNet Address space for spoke virtual network.
   virtual_network_address_space = var.id_vnet_address_space # (Required)  Spoke Virtual Network Parameters
 
   # (Required) Multiple Subnets, Service delegation, Service Endpoints, Network security groups
@@ -42,15 +43,9 @@ module "mod_vnet_spoke" {
   spoke_subnets = var.id_subnets
 
   # By default, forced tunneling is enabled for the spoke.
-  # If you do not want to enable forced tunneling on the spoke route table, 
+  # If you do not want to enable forced tunneling on the spoke route table,
   # set `enable_forced_tunneling = false`.
   enable_forced_tunneling_on_route_table = var.enable_forced_tunneling_on_id_route_table
-
-  # Private DNS Zone Settings
-  # If you do want to create additional Private DNS Zones, 
-  # add in the list of private_dns_zones to be created.
-  # else, remove the private_dns_zones argument.
-  private_dns_zones = var.id_private_dns_zones
 
   # By default, this will apply resource locks to all resources created by this module.
   # To disable resource locks, set the argument to `enable_resource_locks = false`.
@@ -58,4 +53,29 @@ module "mod_vnet_spoke" {
 
   # Tags
   add_tags = local.tags # Tags to be applied to all resources
+}
+
+# Create VNet Peering between Hub and Identity VNets
+module "mod_hub_to_id_vnet_peering" {
+  source  = "azurenoops/overlays-vnet-peering/azurerm"
+  version = "~> 0.1.5-beta"
+
+  depends_on = [module.mod_id_network, module.mod_hub_network]
+
+  location           = var.default_location
+  deploy_environment = var.deploy_environment
+  org_name           = var.org_name
+  environment        = var.environment
+  workload_name      = var.id_name
+
+  # Vnet Peerings details
+  enable_different_subscription_peering           = true
+  resource_group_src_name                         = module.mod_vnet_spoke.resource_group_name
+  different_subscription_dest_resource_group_name = data.azurerm_virtual_network.hub-vnet.resource_group_name
+
+  alias_subscription_id                 = data.azurerm_client_config.current.subscription_id
+  vnet_src_name                         = module.mod_vnet_spoke.virtual_network_name
+  vnet_src_id                           = module.mod_vnet_spoke.virtual_network_id
+  different_subscription_dest_vnet_name = data.azurerm_virtual_network.hub-vnet.virtual_network_name
+  different_subscription_dest_vnet_id   = data.azurerm_virtual_network.hub-vnet.id
 }

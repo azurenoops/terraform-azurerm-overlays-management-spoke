@@ -37,6 +37,13 @@ variable "disable_telemetry" {
   default     = false
 }
 
+variable "subscription_id_hub" {
+  type        = string
+  description = "If specified, identifies the Platform subscription for \"Hub\" for resource deployment and correct placement in the Management Group hierarchy."
+  sensitive   = true
+  default     = null
+}
+
 #######################
 # RG Configuration   ##
 #######################
@@ -59,71 +66,47 @@ variable "existing_resource_group_name" {
   default     = null
 }
 
-#####################################
-# Private Endpoint Configuration   ##
-#####################################
+############################
+# Hub DNS Configuration   ##
+############################
 
-variable "enable_private_endpoint" {
-  description = "Manages a Private Endpoint to Azure Container Registry. Default is false."
-  default     = false
-}
-
-variable "existing_private_dns_zone" {
-  description = "Name of the existing private DNS zone"
+variable "private_dns_zone_hub_resource_group_name" {
+  description = "The name of the private DNS zone resource group"
+  type        = string
   default     = null
 }
 
-variable "private_subnet_address_prefix" {
-  description = "The name of the subnet for private endpoints"
+########################
+# Hub Configuration   ##
+########################
+
+variable "existing_hub_resource_group_name" {
+  description = "The name of the hub resource group"
   default     = null
 }
 
-variable "create_private_endpoint_subnet" {
-  description = "Controls if the subnet should be created. If set to false, the subnet name must be provided. Default is false."
+variable "existing_hub_virtual_network_name" {
+  description = "The name of the hub virtual network"
+  default     = null
+}
+
+variable "existing_hub_firewall_name" {
+  description = "The name of the hub firewall"
+  default     = null
+}
+
+variable "existing_log_analytics_workspace_name" {
+  description = "Specifies the name of the Log Analytics Workspace resource"
+  default     = null
+}
+
+variable "existing_log_analytics_workspace_resource_name" {
+  description = "Specifies the name of the Log Analytics Workspace resource group"
+  default     = null
+}
+
+variable "use_remote_gateways" {
+  description = "Controls if remote gateways can be used on the local virtual network."
   type        = bool
   default     = false
-}
-
-variable "existing_private_subnet_name" {
-  description = "Name of the existing subnet for the private endpoint"
-  default     = null
-}
-
-variable "virtual_network_name" {
-  description = "Name of the virtual network for the private endpoint"
-  default     = null
-}
-
-#####################################
-# Hub Configuration   ##
-#####################################
-
-variable "hub_virtual_network_name" {
-  description = "The name of hub virtual network"
-  default     = null
-}
-
-variable "hub_firewall_private_ip_address" {
-  description = "The private IP of the hub virtual network firewall"
-  default     = null
-}
-
-variable "hub_resource_group_name" {
-  description = "The name of hub resource group"
-  default     = null
-}
-
-variable "log_analytics_workspace_id" {
-  description = "Specifies the id of the Log Analytics Workspace"
-  default     = ""
-}
-
-variable "log_analytics_customer_id" {
-  description = "The Workspace (or Customer) ID for the Log Analytics Workspace."
-  default     = ""
-}
-
-variable "log_analytics_logs_retention_in_days" {
-  description = "The log analytics workspace data retention in days. Possible values range between 30 and 730."
-  default     = ""
 }

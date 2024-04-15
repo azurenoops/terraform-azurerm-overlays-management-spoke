@@ -6,7 +6,7 @@ SUMMARY: Module to deploy a route table in the Management Spoke Network based on
 DESCRIPTION: The following components will be options in this deployment
               * Route Table
                 * Route Table Association
-                * Route     
+                * Route
 AUTHOR/S: jrspinella
 */
 
@@ -30,8 +30,8 @@ resource "azurerm_route" "force_internet_tunneling" {
   route_table_name       = azurerm_route_table.routetable.name
   address_prefix         = "0.0.0.0/0"
   next_hop_type          = "VirtualAppliance"
-  next_hop_in_ip_address = var.hub_firewall_private_ip_address
-  
+  next_hop_in_ip_address = data.azurerm_firewall.hub-fw.ip_configuration[0].private_ip_address
+
   count = var.enable_forced_tunneling_on_route_table ? 1 : 0
 }
 
