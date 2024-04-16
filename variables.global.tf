@@ -85,11 +85,6 @@ variable "existing_hub_resource_group_name" {
   default     = null
 }
 
-variable "existing_hub_virtual_network_name" {
-  description = "The name of the hub virtual network"
-  default     = null
-}
-
 variable "existing_hub_firewall_name" {
   description = "The name of the hub firewall"
   default     = null
@@ -105,8 +100,3 @@ variable "existing_log_analytics_workspace_resource_name" {
   default     = null
 }
 
-variable "use_remote_gateways" {
-  description = "Controls if remote gateways can be used on the local virtual network."
-  type        = bool
-  default     = false
-}
