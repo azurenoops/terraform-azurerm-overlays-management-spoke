@@ -30,7 +30,6 @@ data "azurerm_log_analytics_workspace" "log_analytics" {
 }
 
 data "azurerm_private_dns_zone" "blob" {
-  depends_on          = [module.spoke_st]
   provider            = azurerm.hub_network
   name                = "privatelink.blob.core.windows.net"
   resource_group_name = var.private_dns_zone_hub_resource_group_name
