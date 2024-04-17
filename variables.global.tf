@@ -37,13 +37,6 @@ variable "disable_telemetry" {
   default     = false
 }
 
-variable "subscription_id_hub" {
-  type        = string
-  description = "If specified, identifies the Platform subscription for \"Hub\" for resource deployment and correct placement in the Management Group hierarchy."
-  sensitive   = true
-  default     = null
-}
-
 #######################
 # RG Configuration   ##
 #######################
@@ -70,9 +63,8 @@ variable "existing_resource_group_name" {
 # Hub DNS Configuration   ##
 ############################
 
-variable "private_dns_zone_hub_resource_group_name" {
-  description = "The name of the private DNS zone resource group"
-  type        = string
+variable "existing_private_dns_zone_blob_id" {
+  description = "Specifies the name of the private DNS zone blob id"
   default     = null
 }
 
@@ -80,22 +72,21 @@ variable "private_dns_zone_hub_resource_group_name" {
 # Hub Configuration   ##
 ########################
 
-variable "existing_hub_resource_group_name" {
-  description = "The name of the hub resource group"
+variable "existing_hub_firewall_private_ip_address" {
+  description = "The private IP address of the hub firewall"
   default     = null
 }
 
-variable "existing_hub_firewall_name" {
-  description = "The name of the hub firewall"
-  default     = null
-}
+############################
+# Logging Configuration   ##
+############################
 
-variable "existing_log_analytics_workspace_name" {
+variable "existing_log_analytics_workspace_id" {
   description = "Specifies the name of the Log Analytics Workspace resource"
   default     = null
 }
 
-variable "existing_log_analytics_workspace_resource_name" {
+variable "existing_log_analytics_workspace_resource_id" {
   description = "Specifies the name of the Log Analytics Workspace resource group"
   default     = null
 }

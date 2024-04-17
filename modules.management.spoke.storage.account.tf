@@ -30,7 +30,7 @@ module "spoke_st" {
       name                          = local.pe_name
       subnet_resource_id            = azurerm_subnet.default_snet["default"].id
       subresource_name              = ["blob"]
-      private_dns_zone_resource_ids = [data.azurerm_private_dns_zone.blob.id]
+      private_dns_zone_resource_ids = [var.existing_private_dns_zone_blob_id]
       # these are optional but illustrate making well-aligned service connection & NIC names.
       private_service_connection_name = local.psc_name
       network_interface_name          = local.nic_name
@@ -56,7 +56,7 @@ module "spoke_st" {
   diagnostic_settings_storage_account = {
     storage = {
       name                        = "diag"
-      log_analytics_workspace_id  = data.azurerm_log_analytics_workspace.log_analytics.id
+      log_analytics_workspace_id  = var.existing_log_analytics_workspace_resource_id
       storage_account_resource_id = module.spoke_st.id
       log_categories              = ["audit", "alllogs"]
       metric_categories           = ["AllMetrics"]

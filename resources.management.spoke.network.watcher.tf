@@ -27,9 +27,9 @@ resource "azurerm_network_watcher_flow_log" "nwflog" {
 
   traffic_analytics {
     enabled               = var.enable_traffic_analytics
-    workspace_id          = data.azurerm_log_analytics_workspace.log_analytics.workspace_id
+    workspace_id          = var.existing_log_analytics_workspace_id
     workspace_region      = local.location
-    workspace_resource_id = data.azurerm_log_analytics_workspace.log_analytics.id
+    workspace_resource_id = var.existing_log_analytics_workspace_resource_id
     interval_in_minutes   = 10
   }
 }

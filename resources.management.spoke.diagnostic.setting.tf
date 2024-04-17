@@ -24,7 +24,7 @@ module "mod_vnet_diagnostic_settings" {
   org_name           = var.org_name
 
   resource_id           = module.spoke_vnet.vnet_resource.id
-  logs_destinations_ids = [data.azurerm_log_analytics_workspace.log_analytics.id, module.spoke_st.id]
+  logs_destinations_ids = [var.existing_log_analytics_workspace_resource_id, module.spoke_st.id]
 }
 
 module "mod_nsg_diagnostic_settings" {
@@ -40,5 +40,5 @@ module "mod_nsg_diagnostic_settings" {
   org_name           = var.org_name
 
   resource_id           = azurerm_network_security_group.nsg[each.key].id
-  logs_destinations_ids = [data.azurerm_log_analytics_workspace.log_analytics.id, module.spoke_st.id]
+  logs_destinations_ids = [var.existing_log_analytics_workspace_resource_id, module.spoke_st.id]
 }
