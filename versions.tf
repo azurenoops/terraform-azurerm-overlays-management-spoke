@@ -7,7 +7,7 @@ terraform {
     azurerm = {
       source  = "hashicorp/azurerm"
       version = "~> 3.36"
-      configuration_aliases = [azurerm.hub_network]
+      configuration_aliases = [azurerm.hub_network, azurerm.ops_network]
     }
     azurenoopsutils = {
       source  = "azurenoops/azurenoopsutils"

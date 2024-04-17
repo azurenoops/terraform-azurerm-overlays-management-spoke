@@ -24,7 +24,7 @@ data "azurerm_firewall" "hub-fw" {
 
 data "azurerm_log_analytics_workspace" "log_analytics" {
   depends_on          = [module.spoke_vnet]
-  provider            = azurerm.hub_network
+  provider            = azurerm.ops_network
   name                = var.existing_log_analytics_workspace_name
   resource_group_name = var.existing_log_analytics_workspace_resource_name
 }
