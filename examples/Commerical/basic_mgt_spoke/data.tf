@@ -13,7 +13,7 @@ data "azurerm_firewall" "hub-fw" {
 }
 
 data "azurerm_log_analytics_workspace" "hub-logws" {
-  provider = azurerm.ops
+  provider = azurerm.hub
   name                = "laws-eastus-an1"
   resource_group_name = "laws-rg-eastus-an1"
 }
