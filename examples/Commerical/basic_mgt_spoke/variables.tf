@@ -38,13 +38,6 @@ variable "disable_base_module_tags" {
   default     = false
 }
 
-variable "subscription_id" {
-  type        = string
-  description = "If specified, identifies the Platform subscription for resource deployment and correct placement in the Management Group hierarchy."
-  sensitive   = true
-  default     = null
-}
-
 #################################
 # Resource Lock Configuration
 #################################
