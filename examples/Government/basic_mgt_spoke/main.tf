@@ -4,6 +4,10 @@
 module "mod_vnet_spoke" {
   #source  = "azurenoops/overlays-management-spoke/azurerm"
   #version = "~> x.x.x"
+   providers = {
+    azurerm.hub_network = azurerm.hub,
+    azurerm.ops_network = azurerm.ops
+  }
   source = "../../.."
 
   # By default, this module will create a resource group, provide the name here
@@ -16,10 +20,10 @@ module "mod_vnet_spoke" {
   environment                 = var.environment
   workload_name               = var.id_name
 
-   # (Required) Collect Hub Virtual Network Parameters
+  # (Required) Collect Hub Virtual Network Parameters
   # Hub network details
-  existing_hub_resource_group_name  = data.azurerm_virtual_network.hub-vnet.resource_group_name
-  existing_hub_firewall_name        = data.azurerm_firewall.hub-fw.name
+  existing_hub_resource_group_name = data.azurerm_virtual_network.hub-vnet.resource_group_name
+  existing_hub_firewall_name       = data.azurerm_firewall.hub-fw.name
 
   # pick the value for log analytics resource if which created by hub module
   existing_log_analytics_workspace_resource_name = data.azurerm_log_analytics_workspace.hub-logws.resource_group_name

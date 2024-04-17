@@ -4,6 +4,10 @@
 module "mod_vnet_spoke" {
   #source  = "azurenoops/overlays-management-spoke/azurerm"
   #version = "~> x.x.x"
+  providers = {
+    azurerm.hub_network = azurerm.hub,
+    azurerm.ops_network = azurerm.ops
+  }
   source = "../../.."
 
   # By default, this module will create a resource group, provide the name here
