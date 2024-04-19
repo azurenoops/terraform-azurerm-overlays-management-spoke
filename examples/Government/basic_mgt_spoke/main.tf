@@ -4,7 +4,7 @@
 module "mod_vnet_spoke" {
   #source  = "azurenoops/overlays-management-spoke/azurerm"
   #version = "~> x.x.x"
-  source = "../../.."
+   source = "../../.."
 
   # By default, this module will create a resource group, provide the name here
   # To use an existing resource group, specify the existing resource group name,
@@ -16,18 +16,16 @@ module "mod_vnet_spoke" {
   environment                 = var.environment
   workload_name               = var.id_name
 
-   # (Required) Collect Hub Virtual Network Parameters
+ # (Required) Collect Hub Virtual Network Parameters
   # Hub network details
-  existing_hub_resource_group_name  = data.azurerm_virtual_network.hub-vnet.resource_group_name
-  existing_hub_virtual_network_name = data.azurerm_virtual_network.hub-vnet.name
-  existing_hub_firewall_name        = data.azurerm_firewall.hub-fw.name
+  existing_hub_firewall_private_ip_address = data.azurerm_firewall.hub-fw.ip_configuration[0].private_ip_address
 
   # pick the value for log analytics resource if which created by hub module
-  existing_log_analytics_workspace_resource_name = data.azurerm_log_analytics_workspace.hub-logws.resource_group_name
-  existing_log_analytics_workspace_name          = data.azurerm_log_analytics_workspace.hub-logws.name
+  existing_log_analytics_workspace_resource_id = data.azurerm_log_analytics_workspace.hub-logws.id
+  existing_log_analytics_workspace_id          = data.azurerm_log_analytics_workspace.hub-logws.workspace_id
 
   # DNS Resource Group
-  private_dns_zone_hub_resource_group_name = data.azurerm_resource_group.dns.name
+  existing_private_dns_zone_blob_id = data.azurerm_resource_group.dns.id
 
   # (Required) To enable Azure Monitoring and flow logs
   # To enable traffic analytics, set `enable_traffic_analytics = true` in the module.

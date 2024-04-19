@@ -40,4 +40,3 @@ module "mod_scaffold_rg" {
   add_tags = merge(local.default_tags, var.add_tags, )
 }
 
-
