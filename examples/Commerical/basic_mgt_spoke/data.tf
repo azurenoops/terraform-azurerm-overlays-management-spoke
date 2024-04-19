@@ -15,6 +15,7 @@ data "azurerm_log_analytics_workspace" "hub-logws" {
   resource_group_name = "laws-rg-eastus-an1"
 }
 
-data "azurerm_resource_group" "dns" {
-  name       = "an1-eus-dns-dev-rg"
+data "azurerm_private_dns_zone" "blob" {
+  name                = "privatelink.blob.core.windows.net"
+  resource_group_name = "an1-eus-dns-dev-rg"
 }

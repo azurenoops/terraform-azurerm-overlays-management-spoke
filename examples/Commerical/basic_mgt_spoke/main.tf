@@ -25,7 +25,7 @@ module "mod_vnet_spoke" {
   existing_log_analytics_workspace_id          = data.azurerm_log_analytics_workspace.hub-logws.workspace_id
 
   # DNS Resource Group
-  existing_private_dns_zone_blob_id = data.azurerm_resource_group.dns.id
+  existing_private_dns_zone_blob_id = data.azurerm_resource_group.blob.id
 
   # (Required) To enable Azure Monitoring and flow logs
   # To enable traffic analytics, set `enable_traffic_analytics = true` in the module.
