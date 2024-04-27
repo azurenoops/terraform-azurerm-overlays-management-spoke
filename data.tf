@@ -14,3 +14,4 @@ data "azurerm_network_watcher" "nwatcher" {
   name                = "NetworkWatcher_${local.location}"
   resource_group_name = data.azurerm_resource_group.netwatch.name
 }
+

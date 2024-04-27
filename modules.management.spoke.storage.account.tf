@@ -52,25 +52,6 @@ module "spoke_st" {
     user_assigned_identity_resource_id = var.user_assigned_identity_id
   } : null
 
-  # Diagnostic Settings
-  diagnostic_settings_storage_account = {
-    storage = {
-      name                        = "diag"
-      log_analytics_workspace_id  = var.existing_log_analytics_workspace_resource_id
-      storage_account_resource_id = module.spoke_st.id
-      log_categories              = ["audit", "alllogs"]
-      metric_categories           = ["AllMetrics"]
-    }
-  }
-
-  # Blob Properties
-  containers = {
-    logs = {
-      name                  = "auditlogs"
-      container_access_type = "private"
-    }
-  }
-
   # Blob Properties
   blob_properties = {
     container_delete_retention_policy = {
@@ -88,4 +69,7 @@ module "spoke_st" {
   tags = merge({ "ResourceName" = format("spokestdiaglogs%s", lower(replace(local.spoke_sa_name, "/[[:^alnum:]]/", ""))) }, local.default_tags, var.add_tags, )
 }
 
+data "azurerm_monitor_diagnostic_categories" "main" {
+  resource_id = module.spoke_st.id
+}
 
