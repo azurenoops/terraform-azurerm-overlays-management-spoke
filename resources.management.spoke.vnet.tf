@@ -15,7 +15,7 @@ AUTHOR/S: jrspinella
 #-------------------------------------
 module "spoke_vnet" {
   source  = "azure/avm-res-network-virtualnetwork/azurerm"
-  version = "0.1.4"
+  version = "0.2.3"
 
   # Resource Group
   name                = local.spoke_vnet_name
