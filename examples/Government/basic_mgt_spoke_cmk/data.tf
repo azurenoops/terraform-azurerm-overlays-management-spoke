@@ -22,7 +22,7 @@ data "azurerm_private_dns_zone" "blob" {
   
 }
 
-data "azurem_key_vault" "kv" {
+data "azurerm_key_vault" "kv" {
   name                = "an1-usgva-hub-dev-kv"
   resource_group_name = "an1-usgva-hub-dev-rg"
 }
