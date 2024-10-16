@@ -88,7 +88,7 @@ module "spoke_st" {
     }
   }
 
-  // Storage Diagnostic Settings
+  # Diagnostic Settings
   diagnostic_settings_blob = {
     sendToLogAnalytics = {
       name                           = "sendToLogAnalytics_storage"
@@ -112,6 +112,7 @@ resource "azurerm_user_assigned_identity" "user_assigned_identity" {
   name                = "${local.spoke_sa_name}-usi"
 }
 
+# Assign the User Assigned Identity to the Key Vault
 resource "azurerm_key_vault_access_policy" "spoke_storage" {
   key_vault_id = var.key_vault_resource_id
   tenant_id    = data.azurerm_client_config.current.tenant_id
@@ -125,6 +126,7 @@ resource "azurerm_key_vault_access_policy" "spoke_storage" {
   ]
 }
 
+# Diagnostic Categories
 data "azurerm_monitor_diagnostic_categories" "main" {
   resource_id = module.spoke_st.resource.id
 }
