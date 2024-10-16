@@ -78,6 +78,6 @@ module "mod_hub_to_id_vnet_peering" {
   alias_subscription_id                 = data.azurerm_client_config.current.subscription_id
   vnet_src_name                         = module.mod_vnet_spoke.virtual_network_name
   vnet_src_id                           = module.mod_vnet_spoke.virtual_network_id
-  different_subscription_dest_vnet_name = data.azurerm_virtual_network.hub-vnet.virtual_network_name
+  different_subscription_dest_vnet_name = data.azurerm_virtual_network.hub-vnet.name
   different_subscription_dest_vnet_id   = data.azurerm_virtual_network.hub-vnet.id
 }
