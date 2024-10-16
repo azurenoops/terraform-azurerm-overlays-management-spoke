@@ -64,7 +64,7 @@ module "mod_hub_to_id_vnet_peering" {
   source  = "azurenoops/overlays-vnet-peering/azurerm"
   version = "0.1.5-beta"
 
-  depends_on = [module.mod_id_network, module.mod_hub_network]
+  depends_on = [module.mod_vnet_spoke]
 
   location           = var.default_location
   deploy_environment = var.deploy_environment
