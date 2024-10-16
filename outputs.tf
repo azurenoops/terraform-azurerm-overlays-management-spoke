@@ -62,7 +62,7 @@ output "network_security_group_ids" {
   description = "Map of ids for default NSGs"
   value = { for key, id in zipmap(
     sort(keys(var.spoke_subnets)),
-    sort(values(azurerm_network_security_group.nsg)[*]["id"])) :
+    sort(values(module.nsg)[*]["resource_id"])) :
   key => { key = key, id = id } }
 }
 
@@ -70,7 +70,7 @@ output "network_security_group_names" {
   description = "Map of names for default NSGs"
   value = { for key, name in zipmap(
     sort(keys(var.spoke_subnets)),
-    sort(values(azurerm_network_security_group.nsg)[*]["name"])) :
+    sort(values(module.nsg)[*]["name"])) :
   key => { key = key, name = name } }
 }
 
