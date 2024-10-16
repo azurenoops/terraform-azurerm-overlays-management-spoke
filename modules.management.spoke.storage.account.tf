@@ -115,7 +115,7 @@ resource "azurerm_user_assigned_identity" "user_assigned_identity" {
 resource "azurerm_key_vault_access_policy" "spoke_storage" {
   key_vault_id = var.key_vault_resource_id
   tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = azurerm_user_assigned_identity.user_assigned_identity.principal_id
+  object_id    = azurerm_user_assigned_identity.user_assigned_identity[0].principal_id
 
   secret_permissions = ["Get"]
   key_permissions = [
