@@ -33,7 +33,7 @@ output "virtual_network_id" {
 
 output "virtual_network_address_space" {
   description = "List of address spaces that are used the virtual network."
-  value       = module.hub_vnet.resource.body.properties.addressSpace.addressPrefixes
+  value       = module.spoke_vnet.resource.body.properties.addressSpace.addressPrefixes
 }
 
 output "subnet_ids" {
@@ -97,7 +97,7 @@ output "route_table_id" {
 
 output "storage_account_id" {
   description = "The ID of the storage account."
-  value       = module.spoke_st.id
+  value       = module.spoke_st.resource_id
 }
 
 output "storage_account_name" {
