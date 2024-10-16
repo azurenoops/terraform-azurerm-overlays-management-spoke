@@ -36,10 +36,10 @@ id_subnets = {
     name                                       = "id"
     address_prefixes                           = ["10.8.9.224/27"]
     service_endpoints                          = ["Microsoft.Storage"]
-    private_endpoint_network_policies_enabled  = false
+    private_endpoint_network_policies_enabled  = "Disabled"
     private_endpoint_service_endpoints_enabled = true
-    nsg_subnet_rules = [
-      {
+    nsg_subnet_rules = {
+      allow-traffic-from-spokes = {
         name                       = "Allow-Traffic-From-Spokes",
         description                = "Allow traffic from spokes",
         priority                   = 200,
@@ -51,7 +51,7 @@ id_subnets = {
         source_address_prefixes    = ["10.8.6.0/24", "10.8.7.0/24", "10.8.8.0/24"],
         destination_address_prefix = "10.8.9.0/24"
       }
-    ]
+    }
   }
 }
 
