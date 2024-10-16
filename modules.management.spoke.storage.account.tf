@@ -112,6 +112,19 @@ resource "azurerm_user_assigned_identity" "user_assigned_identity" {
   name                = "${local.spoke_sa_name}-usi"
 }
 
+resource "azurerm_key_vault_access_policy" "spoke_storage" {
+  key_vault_id = var.key_vault_resource_id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = azurerm_user_assigned_identity.user_assigned_identity.principal_id
+
+  secret_permissions = ["Get"]
+  key_permissions = [
+    "Get",
+    "UnwrapKey",
+    "WrapKey"
+  ]
+}
+
 data "azurerm_monitor_diagnostic_categories" "main" {
   resource_id = module.spoke_st.resource.id
 }
