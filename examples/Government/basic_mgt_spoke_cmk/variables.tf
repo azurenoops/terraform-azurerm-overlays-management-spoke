@@ -81,7 +81,6 @@ variable "id_vnet_address_space" {
 
 variable "id_subnets" {
   description = "The subnets of the operations virtual network."
-  default     = {}
 }
 
 variable "enable_forced_tunneling_on_id_route_table" {
