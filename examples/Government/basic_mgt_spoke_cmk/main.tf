@@ -62,7 +62,7 @@ module "mod_vnet_spoke" {
 # Create VNet Peering between Hub and Identity VNets
 module "mod_hub_to_id_vnet_peering" {
   source  = "azurenoops/overlays-vnet-peering/azurerm"
-  version = "0.1.5-beta"
+  version = "1.0.1"
 
   location           = var.default_location
   deploy_environment = var.deploy_environment
