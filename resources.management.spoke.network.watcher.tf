@@ -17,7 +17,7 @@ resource "azurerm_network_watcher_flow_log" "nwflog" {
   network_watcher_name      = data.azurerm_network_watcher.nwatcher.name
   resource_group_name       = data.azurerm_resource_group.netwatch.name # Must provide Netwatcher resource Group
   network_security_group_id = module.nsg[each.key].resource_id
-  storage_account_id        = module.spoke_st.id
+  storage_account_id        = module.spoke_st.resource_id
   enabled                   = true
   version                   = 2
   retention_policy {
