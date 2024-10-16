@@ -15,7 +15,7 @@ AUTHOR/S: jrspinella
 #-------------------------------------
 module "spoke_vnet" {
   source  = "azure/avm-res-network-virtualnetwork/azurerm"
-  version = "0.1.4"
+  version = "0.4.2"
 
   # Resource Group
   name                = local.spoke_vnet_name
@@ -23,18 +23,26 @@ module "spoke_vnet" {
   location            = local.location
 
   # Virtual Network DNS Servers
-  virtual_network_dns_servers = {
+  dns_servers = {
     dns_servers = var.dns_servers
   }
 
   # Virtual Network Address Space
-  virtual_network_address_space = var.virtual_network_address_space
+  address_space = var.virtual_network_address_space
 
   # Ddos protection plan - Default is "false"
-  virtual_network_ddos_protection_plan = var.create_ddos_plan ? {
+  ddos_protection_plan = var.create_ddos_plan ? {
     enable = true
     id     = module.mod_spoke_vnet_ddos[0].resource.id
   } : null
+
+  role_assignments = {
+    role_assignment_nw_peering = {
+      role_definition_id_or_name       = "Network Contributor"
+      principal_id                     = data.azurerm_client_config.current.object_id
+      skip_service_principal_aad_check = false
+    },
+  }
 
   # Resource Lock
   lock = var.enable_resource_locks ? {
@@ -54,7 +62,7 @@ module "spoke_vnet" {
 #--------------------------------------------
 module "mod_spoke_vnet_ddos" {
   source              = "azure/avm-res-network-ddosprotectionplan/azurerm"
-  version             = "0.1.0"
+  version             = "0.2.0"
   count               = var.create_ddos_plan ? 1 : 0
   name                = local.ddos_plan_name
   resource_group_name = local.resource_group_name
