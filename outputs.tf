@@ -23,17 +23,17 @@ output "resource_group_location" {
 # Vnet and Subnets
 output "virtual_network_name" {
   description = "The name of the virtual network"
-  value       = module.spoke_vnet.vnet_resource.name
+  value       = module.spoke_vnet.name
 }
 
 output "virtual_network_id" {
   description = "The id of the virtual network"
-  value       = module.spoke_vnet.vnet_resource.id
+  value       = module.spoke_vnet.resource_id
 }
 
 output "virtual_network_address_space" {
   description = "List of address spaces that are used the virtual network."
-  value       = module.spoke_vnet.vnet_resource.address_space
+  value       = module.spoke_vnet.resource.body.properties.addressSpace.addressPrefixes
 }
 
 output "subnet_ids" {
@@ -62,7 +62,7 @@ output "network_security_group_ids" {
   description = "Map of ids for default NSGs"
   value = { for key, id in zipmap(
     sort(keys(var.spoke_subnets)),
-    sort(values(azurerm_network_security_group.nsg)[*]["id"])) :
+    sort(values(module.nsg)[*]["resource_id"])) :
   key => { key = key, id = id } }
 }
 
@@ -70,7 +70,7 @@ output "network_security_group_names" {
   description = "Map of names for default NSGs"
   value = { for key, name in zipmap(
     sort(keys(var.spoke_subnets)),
-    sort(values(azurerm_network_security_group.nsg)[*]["name"])) :
+    sort(values(module.nsg)[*]["name"])) :
   key => { key = key, name = name } }
 }
 
@@ -97,7 +97,7 @@ output "route_table_id" {
 
 output "storage_account_id" {
   description = "The ID of the storage account."
-  value       = module.spoke_st.id
+  value       = module.spoke_st.resource_id
 }
 
 output "storage_account_name" {

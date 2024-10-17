@@ -16,11 +16,11 @@ resource "azurerm_subnet" "default_snet" {
   for_each             = var.spoke_subnets
   name                 = var.custom_spoke_subnet_name != null ? "${var.custom_spoke_subnet_name}_${each.key}" : "${data.azurenoopsutils_resource_name.snet[each.key].result}"
   resource_group_name  = local.resource_group_name
-  virtual_network_name = module.spoke_vnet.vnet_resource.name
+  virtual_network_name = module.spoke_vnet.name
   address_prefixes     = each.value.address_prefixes
   service_endpoints    = lookup(each.value, "service_endpoints", [])
   # Applicable to the subnets which used for Private link endpoints or services
-  private_endpoint_network_policies_enabled     = lookup(each.value, "private_endpoint_network_policies_enabled", null)
+  private_endpoint_network_policies  = lookup(each.value, "private_endpoint_network_policies_enabled", null)
   private_link_service_network_policies_enabled = lookup(each.value, "private_link_service_network_policies_enabled", null)
 
   dynamic "delegation" {

@@ -24,8 +24,8 @@ module "mod_vnet_diagnostic_settings" {
   org_name           = var.org_name
   workload_name      = format("%s-vnet", var.workload_name)
 
-  resource_id           = module.spoke_vnet.vnet_resource.id
-  logs_destinations_ids = [var.existing_log_analytics_workspace_resource_id, module.spoke_st.id]
+  resource_id           = module.spoke_vnet.resource_id
+  logs_destinations_ids = [var.existing_log_analytics_workspace_resource_id, module.spoke_st.resource.id]
 }
 
 module "mod_nsg_diagnostic_settings" {
@@ -42,22 +42,7 @@ module "mod_nsg_diagnostic_settings" {
   workload_name      = format("%s-nsg", var.workload_name)
 
 
-  resource_id           = azurerm_network_security_group.nsg[each.key].id
-  logs_destinations_ids = [var.existing_log_analytics_workspace_resource_id, module.spoke_st.id]
+  resource_id           = module.nsg[each.key].resource_id
+  logs_destinations_ids = [var.existing_log_analytics_workspace_resource_id, module.spoke_st.resource.id]
 }
 
-module "mod_storage_diagnostic_settings" {
-  source  = "azurenoops/overlays-diagnostic-settings/azurerm"
-  version = "1.5.0"
-
-  # Resource Group, location, VNet and Subnet details
-  location           = var.location
-  deploy_environment = var.deploy_environment
-  environment        = var.environment
-  org_name           = var.org_name
-  workload_name      = format("%s-storage", var.workload_name)
-
-
-  resource_id           = module.spoke_st.id
-  logs_destinations_ids = [var.existing_log_analytics_workspace_resource_id, module.spoke_st.id]
-}
