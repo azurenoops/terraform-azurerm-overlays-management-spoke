@@ -69,8 +69,7 @@ EOT
 variable "spoke_storage_user_assigned_resource_ids" {
   description = "This is to assign user assigned identities. This is not used for Customer Managed Keys."
   type = list(string)
-  default = null
-  
+  default = null  
 }
 
 variable "existing_private_dns_zone_blob_id" {

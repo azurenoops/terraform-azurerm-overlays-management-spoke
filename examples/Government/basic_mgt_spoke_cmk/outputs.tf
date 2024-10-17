@@ -84,12 +84,12 @@ output "route_table_id" {
 # Storage Account
 output "storage_account_id" {
   description = "The ID of the storage account."
-  value       = module.mod_vnet_spoke.storage_account_id
+  value       = module.mod_vnet_spoke.spoke_storage_account_id
 }
 
 output "storage_account_name" {
   description = "The name of the storage account."
-  value       = module.mod_vnet_spoke.storage_account_name
+  value       = module.mod_vnet_spoke.spoke_storage_account_name
 }
 
 
