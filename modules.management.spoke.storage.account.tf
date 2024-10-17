@@ -73,6 +73,11 @@ module "spoke_st" {
       principal_id                     = data.azurerm_client_config.current.object_id
       skip_service_principal_aad_check = false
     },
+    role_assignment_uai_cmk = var.enable_customer_managed_keys ? {
+      role_definition_id_or_name       = "Key Vault Crypto Officer"
+      principal_id                     = azurerm_user_assigned_identity.user_assigned_identity[0].principal_id
+      skip_service_principal_aad_check = false
+    } : null
   }
 
   # Blob Properties
@@ -112,22 +117,8 @@ resource "azurerm_user_assigned_identity" "user_assigned_identity" {
   name                = "${local.spoke_sa_name}-usi"
 }
 
-# Assign the User Assigned Identity to the Key Vault
-resource "azurerm_key_vault_access_policy" "spoke_storage" {
-  key_vault_id = var.key_vault_resource_id
-  tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = azurerm_user_assigned_identity.user_assigned_identity[0].principal_id
-
-  secret_permissions = ["Get"]
-  key_permissions = [
-    "Get",
-    "UnwrapKey",
-    "WrapKey"
-  ]
-}
-
 # Diagnostic Categories
-data "azurerm_monitor_diagnostic_categories" "main" {
+/* data "azurerm_monitor_diagnostic_categories" "main" {
   resource_id = module.spoke_st.resource.id
-}
+} */
 
