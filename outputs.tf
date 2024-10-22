@@ -95,17 +95,21 @@ output "route_table_id" {
   value       = azurerm_route_table.routetable.id
 }
 
-output "storage_account_id" {
+output "spoke_storage_account_id" {
   description = "The ID of the storage account."
   value       = module.spoke_st.resource_id
 }
 
-output "storage_account_name" {
+output "spoke_storage_account_name" {
   description = "The name of the storage account."
   value       = module.spoke_st.name
 }
 
-output "storage_account_private_endpoints" {
-  description = "The name of the storage account."
+output "spoke_storage_account_private_endpoints" {
+  description = "The private endpoints of the storage account."
   value       = module.spoke_st.private_endpoints
+}
+
+output "spoke_storage_account_cmk_user_assigned_identity_principal_id" {
+  value = var.enable_customer_managed_keys ? azurerm_user_assigned_identity.user_assigned_identity[0].principal_id : null
 }
