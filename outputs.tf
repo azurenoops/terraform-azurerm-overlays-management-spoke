@@ -40,7 +40,7 @@ output "subnet_ids" {
   description = "Map of IDs of subnets"
   value = { for key, id in zipmap(
     sort(keys(var.spoke_subnets)),
-    sort(values(azurerm_subnet.default_snet)[*]["id"])) :
+    sort(values(module.default_snet)[*]["resource_id"])) :
   key => { key = key, id = id } }
 }
 
@@ -48,13 +48,13 @@ output "subnet_names" {
   description = "Map of names of subnets"
   value = { for key, name in zipmap(
     sort(keys(var.spoke_subnets)),
-    sort(values(azurerm_subnet.default_snet)[*]["name"])) :
+    sort(values(module.default_snet)[*]["name"])) :
   key => { key = key, name = name } }
 }
 
 output "subnet_address_prefixes" {
   description = "List of address prefix for subnets"
-  value       = flatten(concat([for s in azurerm_subnet.default_snet : s.address_prefixes]))
+  value       = flatten(concat([for s in module.default_snet : s.resource.body.properties.addressPrefixes]))
 }
 
 # Network Security group ids
@@ -108,8 +108,4 @@ output "spoke_storage_account_name" {
 output "spoke_storage_account_private_endpoints" {
   description = "The private endpoints of the storage account."
   value       = module.spoke_st.private_endpoints
-}
-
-output "spoke_storage_account_cmk_user_assigned_identity_principal_id" {
-  value = var.enable_customer_managed_keys ? azurerm_user_assigned_identity.user_assigned_identity[0].principal_id : null
 }

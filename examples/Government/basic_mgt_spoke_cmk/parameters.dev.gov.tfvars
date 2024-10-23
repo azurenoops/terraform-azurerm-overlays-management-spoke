@@ -6,7 +6,7 @@
 ###########################
 
 # The prefixes to use for all resources in this deployment
-org_name           = "anoa"         # This Prefix will be used on most deployed resources.  10 Characters max.
+org_name           = "an16"         # This Prefix will be used on most deployed resources.  10 Characters max.
 deploy_environment = "dev"          # dev | test | prod
 environment        = "usgovernment" # public | usgovernment
 
@@ -18,7 +18,7 @@ enable_resource_locks = false # true | false
 
 # Enable NSG Flow Logs
 # By default, this will enable flow logs traffic analytics for all subnets.
-enable_traffic_analytics = true
+enable_traffic_analytics = false
 
 #################################################
 # Identity Management Spoke Virtual Network   ###
@@ -35,7 +35,7 @@ id_subnets = {
   default = {
     name                                       = "id"
     address_prefixes                           = ["10.8.9.224/27"]
-    service_endpoints                          = ["Microsoft.Storage"]
+    service_endpoints                          = ["Microsoft.Storage", "Microsoft.KeyVault"]
     private_endpoint_network_policies_enabled  = "Disabled"
     private_endpoint_service_endpoints_enabled = true
     nsg_subnet_rules = {
