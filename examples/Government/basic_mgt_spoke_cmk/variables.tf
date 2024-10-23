@@ -38,11 +38,6 @@ variable "disable_base_module_tags" {
   default     = false
 }
 
-variable "subscription_id" {
-  type        = string
-  description = "The subscription ID to use for the resources deployed by this module."
-}
-
 #################################
 # Resource Lock Configuration
 #################################

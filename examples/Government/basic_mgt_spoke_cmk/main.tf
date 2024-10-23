@@ -27,8 +27,10 @@ module "mod_vnet_spoke" {
   # (Optional) Enable Customer Managed Key for Azure Storage Account
   enable_customer_managed_keys = true
   # Uncomment the following lines to enable Customer Managed Key for Azure Identity Storage Account
-  key_vault_resource_id       = data.azurerm_key_vault.kv.id
-  key_name                    = "cmk-for-storage-account"
+  key_vault_resource_id               = data.azurerm_key_vault.kv.id
+  key_name                            = "cmk-for-storage-account"
+  user_assigned_identity_id           = azurerm_user_assigned_identity.spoke_user_assigned_identity.id
+  user_assigned_identity_principal_id = azurerm_user_assigned_identity.spoke_user_assigned_identity.principal_id
 
   # DNS Resource Group
   existing_private_dns_zone_blob_id = [data.azurerm_private_dns_zone.blob.id]
