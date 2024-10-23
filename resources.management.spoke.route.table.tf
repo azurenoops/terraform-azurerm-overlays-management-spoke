@@ -20,7 +20,7 @@ resource "azurerm_route_table" "routetable" {
 
 resource "azurerm_subnet_route_table_association" "rtassoc" {
   for_each       = var.spoke_subnets
-  subnet_id      = azurerm_subnet.default_snet[each.key].id
+  subnet_id      = module.default_snet[each.key].resource_id
   route_table_id = azurerm_route_table.routetable.id
 }
 
