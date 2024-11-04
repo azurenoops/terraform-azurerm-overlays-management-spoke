@@ -14,7 +14,7 @@ AUTHOR/S: jrspinella
 
 module "default_snet" {
   source   = "azure/avm-res-network-virtualnetwork/azurerm//modules/subnet"
-  version  = "0.4.2"
+  version  = "0.6.0"
   depends_on = [ module.spoke_vnet ]
   for_each = var.spoke_subnets
 
